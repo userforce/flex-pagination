@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <script type="text/javascript" src="../dist/js/flex-pagination.js"></script>
+    <title>Flex Pagination</title>
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css?family=Lexend+Deca&display=swap');
+    .example{
+        height: 350px;
+        -webkit-box-shadow: 0px 7px 15px 0px rgba(0,0,0,0.05);
+        -moz-box-shadow: 0px 7px 15px 0px rgba(0,0,0,0.05);
+        box-shadow: 0px 7px 15px 0px rgba(0,0,0,0.05);
+        padding: 15px;
+        font-size: 20px;
+        overflow: auto;
+        font-family: 'Lexend Deca', sans-serif;
+    }
+    .example p{
+        color: #777777;
+    }
+    .example p b {
+        color: #000000;
+    }
+    .example-title {
+        border-bottom: 1px solid #000;
+        margin-bottom: 15px;
+        font-size: 20px;
+        color: black;
+        font-family: 'Lexend Deca', sans-serif;
+    }
+</style>
+<body style="margin: 0; padding: 0;">
+<div id="app">
+    <br/>
+    <br/>
+    <div style="width: 1200px; margin: 0 auto;">
+
+        <div class="example-title">
+            Default configuration example
+        </div>
+        <div class="example">
+            <b>Page {{ pagination.page }}</b><br/>
+            {{ content[pagination.page] }}
+            <flex-pagination :pagination="pagination">
+            </flex-pagination>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    new Vue({
+        el: '#app',
+
+        components: {
+            'flex-pagination': FlexPagination
+        },
+
+        data() {
+            return {
+                content: [],
+                pagination: {
+                    page: 2,
+                    total: 50,
+                    range: {
+                        before: 5,
+                        after: 5
+                    }
+                }
+            };
+        },
+
+        methods: {
+
+            setContent() {
+                let content = [];
+                for ( let i = 1; i < 5; i++ ) {
+                    content.push(this.getText());
+                }
+                this.content = content;
+            },
+
+            getText() {
+                let text = '';
+                let textLength = this.getRandomNumber(100, 150);
+                for (let i = 0; i < textLength; i++ ) {
+                    text += this.getRandomString() +  ' ';
+                }
+                return text.slice(0, 1).toUpperCase() + text.slice(1, text.length - 1) + '.';
+            },
+
+            getRandomString() {
+                return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, this.getRandomNumber(2, 11));
+            },
+
+            getRandomNumber(min = 0, max = 500) {
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min)) + min;
+            }
+        },
+
+        mounted() {
+            this.setContent();
+        }
+    });
+</script>
+</body>
+</html>
