@@ -6,23 +6,27 @@
     <title>Flex Pagination</title>
 </head>
 <style>
-    @import url('https://fonts.googleapis.com/css?family=Lexend+Deca&display=swap');
-    .example{
+    @import url('https://fonts.googleapis.com/css?family=Lexend+Deca&Share+Tech+Mono&display=swap');
+
+    .example {
         height: 350px;
-        -webkit-box-shadow: 0px 7px 15px 0px rgba(0,0,0,0.05);
-        -moz-box-shadow: 0px 7px 15px 0px rgba(0,0,0,0.05);
-        box-shadow: 0px 7px 15px 0px rgba(0,0,0,0.05);
-        padding: 15px;
-        font-size: 20px;
+        -webkit-box-shadow: 0px 7px 15px 0px rgba(0, 0, 0, 0.05);
+        -moz-box-shadow: 0px 7px 15px 0px rgba(0, 0, 0, 0.05);
+        box-shadow: 0px 7px 15px 0px rgba(0, 0, 0, 0.05);
+        padding: 15px 55px 15px 15px;
+        font-size: 14px;
         overflow: auto;
-        font-family: 'Lexend Deca', sans-serif;
+        font-family: 'Share Tech Mono', monospace;
     }
-    .example p{
+
+    .example p {
         color: #777777;
     }
+
     .example p b {
         color: #000000;
     }
+
     .example-title {
         border-bottom: 1px solid #000;
         margin-bottom: 15px;
@@ -41,11 +45,13 @@
             Default configuration example
         </div>
         <div class="example">
-            <b>Page {{ pagination.page }}</b><br/>
-            {{ content[pagination.page] }}
-            <flex-pagination :pagination="pagination">
-            </flex-pagination>
+            <b>Page {{ example1.pagination.page }}</b><br/>
+            <p v-html="content[example1.pagination.page]"></p>
         </div>
+        <flex-pagination :pagination="example1.pagination">
+
+        </flex-pagination>
+
     </div>
 </div>
 <script type="text/javascript">
@@ -59,12 +65,35 @@
         data() {
             return {
                 content: [],
-                pagination: {
-                    page: 2,
-                    total: 50,
+                example1: {
+                    pagination: {
+                        page: 1,
+                        total: 50,
+                    },
+                },
+                example2: {
+                    pagination: {
+                        page: 1,
+                        total: 50,
+                    },
                     range: {
                         before: 5,
                         after: 5
+                    },
+                },
+                example3: {
+                    pagination: {
+                        page: 1,
+                        total: 50,
+                    },
+                    range: {
+                        before: 5,
+                        after: 5
+                    },
+                    config: {
+                        scroll: {
+                            prefix: 'page-id-prefix-'
+                        }
                     }
                 }
             };
@@ -74,19 +103,29 @@
 
             setContent() {
                 let content = [];
-                for ( let i = 1; i < 5; i++ ) {
+                for (let i = 1; i < 5; i++) {
                     content.push(this.getText());
                 }
                 this.content = content;
             },
 
             getText() {
-                let text = '';
-                let textLength = this.getRandomNumber(100, 150);
-                for (let i = 0; i < textLength; i++ ) {
-                    text += this.getRandomString() +  ' ';
+                let self = this;
+                let generateText = function() {
+                    let text = '';
+                    for (let i = 0; i < self.getRandomNumber(100, 150); i++) {
+                        text += self.getRandomString() + ' ';
+                    }
+                    return text;
+                };
+                let paragraph = '';
+                for (let i = 0; i <= self.getRandomNumber(3, 7); i++) {
+                    let randomText = generateText();
+                    let text = randomText.slice(0, 1).toUpperCase() + randomText.slice(1, randomText.length - 1) + '. <br/></br>';
+                    paragraph += text;
                 }
-                return text.slice(0, 1).toUpperCase() + text.slice(1, text.length - 1) + '.';
+
+                return paragraph;
             },
 
             getRandomString() {

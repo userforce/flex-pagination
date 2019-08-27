@@ -3,38 +3,48 @@
 
     export default {
         name: 'flex-pagination',
-        components: {
-
-        },
         props: {
             pagination: {
                 type: Object,
-                // Required
+                required: true,
                 validator: validator.isValidPagination
+            },
+            range: {
+                type: Object,
+                required: false,
+                validator: validator.isValidRange
             },
             config: {
                 type: Object,
-                // Not required
+                required: false,
                 validator: validator.isValidConfig
-            },
-            anchor: {
-                type: String,
-                // Not required
-                validator: validator.isValidAnchor
-            },
+            }
         },
         data() {
             return {
-
+                default: {
+                    range: {
+                        before: 5,
+                        after: 5
+                    },
+                    config: {
+                        show: {
+                            first: true,
+                            last: true,
+                            next: true,
+                            prev: true
+                        },
+                        scroll: {
+                            prefix: null
+                        }
+                    }
+                }
             }
         },
-        updated() {
+        methods: {
 
         },
         mounted() {
-
-        },
-        methods: {
 
         }
     }
@@ -42,12 +52,22 @@
 
 <template>
     <div class="flexp">
+        <ul class="flexp-nav">
+            <li class="flexp-btn flexp-first">
+                <slot name="flexpfirstcontent">
+                    slot default content
+                </slot>
+            </li>
+        </ul>
 
-        Hello world!
 
-        {{ pagination.page }}
-        {{ pagination.total }}
-        {{ pagination.range.afterPage }}
-        {{ pagination.range.beforePage }}
+
+
+<!--        Hello world!-->
+
+<!--        {{ pagination.page }}-->
+<!--        {{ pagination.total }}-->
+<!--        {{ pagination.range.afterPage }}-->
+<!--        {{ pagination.range.beforePage }}-->
     </div>
 </template>

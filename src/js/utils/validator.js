@@ -1,3 +1,5 @@
+import helpers from './helpers';
+
 let Validator = function() {
 
     let self = this;
@@ -13,48 +15,76 @@ let Validator = function() {
     let isNumber = function(value, name) {
         let isValid = !!value.toString().match(/^[\d.]+$/g);
         if (!isValid) {
-            console.error(name + " must be a number.");
+            console.error(name + " must be of type Number.");
         }
         return isValid;
     };
 
-    let hasRange = function(object) {
-        let hasRange = false;
-        if (object.hasOwnProperty('range')) {
-            hasRange = object.range.hasOwnProperty('before') && object.range.hasOwnProperty('after');
+    let isBoolean = function(value, name) {
+        let isValid = !!(typeof value === "boolean");
+        if (!isValid) {
+            console.error(name + " must be of type Boolean.");
         }
-        return hasRange;
+        return isValid;
+    };
+
+    let isValidPage = function(pagination) {
+        if (hasRequired(pagination, 'page', 'pagination')) {
+            return isNumber(pagination.page);
+        }
+        return false;
+    };
+
+    let isValidTotal = function(pagination) {
+        if (hasRequired(pagination, 'total', 'pagination')) {
+            return isNumber(pagination.page);
+        }
+        return false;
+    };
+
+    let isValidScrollPrefix = function(string) {
+        let isValid = helpers.isValidClassName(string);
+        if (!isValid) console.error("scroll prefix must be a valid html id name.");
+        return isValid;
     };
 
     self.isValidPagination = function (pagination = {}) {
-        let isValid = false;
         if (typeof pagination === "object") {
-            let hasPage = hasRequired(pagination, 'page', 'pagination');
-            let hasTotal = hasRequired(pagination, 'total', 'pagination');
-            if (hasPage && hasTotal) {
-                isValid = isNumber(pagination.page) && isNumber(pagination.total);
-            }
-            if (hasRange(pagination)) {
-                let isValidRangeBefore = isNumber(pagination.range.before, 'pagination.range.before');
-                let isValidRangeAfter = isNumber(pagination.range.after, 'pagination.range.after');
-                isValid = isValidRangeBefore && isValidRangeAfter;
-            }
+            return isValidPage(pagination) && isValidTotal(pagination);
+        }
+        return false;
+    };
+
+    self.isValidRange = function(range) {
+        let isValid = true;
+        if (range.hasOwnProperty('before')) {
+            isValid = isValid && isNumber(range.before, 'range.before');
+        }
+        if (range.hasOwnProperty('after')) {
+            isValid = isValid && isNumber(range.after, 'range.after');
         }
         return isValid;
     };
 
     self.isValidConfig = function (config = {}) {
-        if (typeof config === "object") {
-
+        let isValid = true;
+        if (helpers.hasInnerProperty(config, 'show.next')) {
+            isValid = isValid && isBoolean(config.show.next, 'config.show.next');
         }
-        return true;
-    };
-
-    self.isValidAnchor = function (anchor = '') {
-        if (typeof config === "string") {
-
+        if (helpers.hasInnerProperty(config, 'show.prev')) {
+            isValid = isValid && isBoolean(config.show.prev, 'config.show.prev');
         }
-        return true;
+        if (helpers.hasInnerProperty(config, 'show.first')) {
+            isValid = isValid && isBoolean(config.show.first, 'config.show.first');
+        }
+        if (helpers.hasInnerProperty(config, 'show.last')) {
+            isValid = isValid && isBoolean(config.show.last, 'config.show.last');
+        }
+        if (helpers.hasInnerProperty(config, 'scroll.prefix')) {
+            isValid = isValid && isValidScrollPrefix(config.scroll.prefix.toString());
+        }
+
+        return isValid;
     };
 
 };

@@ -1,4 +1,24 @@
-(function(g,f){typeof exports==='object'&&typeof module!=='undefined'?module.exports=f():typeof define==='function'&&define.amd?define(f):(g=g||self,g.FlexPagination=f());}(this,function(){'use strict';let Validator = function() {
+(function(g,f){typeof exports==='object'&&typeof module!=='undefined'?module.exports=f():typeof define==='function'&&define.amd?define(f):(g=g||self,g.FlexPagination=f());}(this,function(){'use strict';let Helpers = function() {
+
+    this.hasInnerProperty = function(object, path) {
+        let nodes = path.split('.');
+        if (nodes.length > 1) {
+            let firstNode = nodes.shift();
+            if (object.hasOwnProperty(firstNode)) {
+                return this.hasInnerProperty(object[firstNode], nodes.join('.'))
+            }
+            return false;
+        } else {
+            return object.hasOwnProperty(path);
+        }
+    };
+
+    this.isValidClassName = function(string) {
+        return !!string.match(/^[a-zA-Z][a-zA-Z_\-\d.]+$/gi);
+    };
+};
+
+var helpers = new Helpers();let Validator = function() {
 
     let self = this;
 
@@ -13,39 +33,85 @@
     let isNumber = function(value, name) {
         let isValid = !!value.toString().match(/^[\d.]+$/g);
         if (!isValid) {
-            console.error(name + " must be a number.");
+            console.error(name + " must be of type Number.");
         }
         return isValid;
     };
 
-    let hasRange = function(object) {
-        let hasRange = false;
-        if (object.hasOwnProperty('range')) {
-            hasRange = object.range.hasOwnProperty('before') && object.range.hasOwnProperty('after');
+    let isBoolean = function(value, name) {
+        let isValid = !!(typeof value === "boolean");
+        if (!isValid) {
+            console.error(name + " must be of type Boolean.");
         }
-        return hasRange;
+        return isValid;
+    };
+
+    let isValidPage = function(pagination) {
+        if (hasRequired(pagination, 'page', 'pagination')) {
+            return isNumber(pagination.page);
+        }
+        return false;
+    };
+
+    let isValidTotal = function(pagination) {
+        if (hasRequired(pagination, 'total', 'pagination')) {
+            return isNumber(pagination.page);
+        }
+        return false;
+    };
+
+    let isValidScrollPrefix = function(string) {
+        let isValid = helpers.isValidClassName(string);
+        if (!isValid) console.error("scroll prefix must be a valid html id name.");
+        return isValid;
     };
 
     self.isValidPagination = function (pagination = {}) {
-        let isValid = false;
         if (typeof pagination === "object") {
-            let hasPage = hasRequired(pagination, 'page', 'pagination');
-            let hasTotal = hasRequired(pagination, 'total', 'pagination');
-            if (hasPage && hasTotal) {
-                isValid = isNumber(pagination.page) && isNumber(pagination.total);
-            }
-            if (hasRange(pagination)) {
-                let isValidRangeBefore = isNumber(pagination.range.before, 'pagination.range.before');
-                let isValidRangeAfter = isNumber(pagination.range.after, 'pagination.range.after');
-                isValid = isValidRangeBefore && isValidRangeAfter;
-            }
+            return isValidPage(pagination) && isValidTotal(pagination);
+        }
+        return false;
+    };
+
+    self.isValidRange = function(range) {
+        let isValid = true;
+        if (range.hasOwnProperty('before')) {
+            isValid = isValid && isNumber(range.before, 'range.before');
+        }
+        if (range.hasOwnProperty('after')) {
+            isValid = isValid && isNumber(range.after, 'range.after');
         }
         return isValid;
     };
 
     self.isValidConfig = function (config = {}) {
-        return true;
+        let isValid = true;
+        if (helpers.hasInnerProperty(config, 'show.next')) {
+            isValid = isValid && isBoolean(config.show.next, 'config.show.next');
+        }
+        if (helpers.hasInnerProperty(config, 'show.prev')) {
+            isValid = isValid && isBoolean(config.show.prev, 'config.show.prev');
+        }
+        if (helpers.hasInnerProperty(config, 'show.first')) {
+            isValid = isValid && isBoolean(config.show.first, 'config.show.first');
+        }
+        if (helpers.hasInnerProperty(config, 'show.last')) {
+            isValid = isValid && isBoolean(config.show.last, 'config.show.last');
+        }
+        if (helpers.hasInnerProperty(config, 'scroll.prefix')) {
+            isValid = isValid && isValidScrollPrefix(config.scroll.prefix.toString());
+        }
+
+        return isValid;
     };
+
+
+
+
+
+
+
+
 
     self.isValidAnchor = function (anchor = '') {
         return true;
@@ -55,38 +121,48 @@
 
 var validator = new Validator();var script = {
     name: 'flex-pagination',
-    components: {
-
-    },
     props: {
         pagination: {
             type: Object,
-            // Required
+            required: true,
             validator: validator.isValidPagination
+        },
+        range: {
+            type: Object,
+            required: false,
+            validator: validator.isValidRange
         },
         config: {
             type: Object,
-            // Not required
+            required: false,
             validator: validator.isValidConfig
-        },
-        anchor: {
-            type: String,
-            // Not required
-            validator: validator.isValidAnchor
-        },
+        }
     },
     data() {
         return {
-
+            default: {
+                range: {
+                    before: 5,
+                    after: 5
+                },
+                config: {
+                    show: {
+                        first: true,
+                        last: true,
+                        next: true,
+                        prev: true
+                    },
+                    scroll: {
+                        prefix: null
+                    }
+                }
+            }
         }
     },
-    updated() {
+    methods: {
 
     },
     mounted() {
-
-    },
-    methods: {
 
     }
 };function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
@@ -181,17 +257,20 @@ var __vue_render__ = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("div", { staticClass: "flexp" }, [
-    _vm._v(
-      "\n\n    Hello world!\n\n    " +
-        _vm._s(_vm.pagination.page) +
-        "\n    " +
-        _vm._s(_vm.pagination.total) +
-        "\n    " +
-        _vm._s(_vm.pagination.range.afterPage) +
-        "\n    " +
-        _vm._s(_vm.pagination.range.beforePage) +
-        "\n"
-    )
+    _c("ul", { staticClass: "flexp-nav" }, [
+      _c(
+        "li",
+        { staticClass: "flexp-btn flexp-first" },
+        [
+          _vm._t("flexpfirstcontent", [
+            _vm._v(
+              "\n                    slot default content\n                "
+            )
+          ])
+        ],
+        2
+      )
+    ])
   ])
 };
 var __vue_staticRenderFns__ = [];
