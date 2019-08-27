@@ -1,0 +1,35 @@
+{
+    "name": "flex-pagination",
+    "version": "1.0.0",
+    "description": "VueJs responsive pagination component which is tracking scrolling, can be displayed vertically and is fully customizable",
+    "main": "dist/js/flex-pagination.js",
+    "scripts": {
+        "build": "NODE_ENV=development node_modules/.bin/rollup -c  ./build/rollup.config.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/userforce/flex-pagination.git"
+    },
+    "keywords": [
+        "flex-pagination",
+        "pagination",
+        "vuejs",
+        "component",
+        "responsive",
+        "scroll",
+        "tracking"
+    ],
+    "author": "Tudor Corcimar",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/userforce/flex-pagination/issues"
+    },
+    "homepage": "https://github.com/userforce/flex-pagination#readme",
+    "devDependencies": {
+        "rollup": "^1.20.2",
+        "rollup-plugin-commonjs": "^10.0.2",
+        "rollup-plugin-vue": "^5.0.1",
+        "vue-template-compiler": "^2.6.10"
+    }
+}
