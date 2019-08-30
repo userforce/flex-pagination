@@ -100,6 +100,10 @@
         color: #032bf2;
     }
 
+    .code .comment {
+        color: #888888;
+    }
+
     .note {
         background: #fff7f0;
         font-size: 14px;
@@ -138,10 +142,25 @@
     .result b {
         padding-right: 5px;
     }
+    
+    .loader {
+        padding-top: 15px;
+        font-size: 20px;
+        color: #777777;
+        text-align: center;
+    }
+
+    .event {
+        background: #d2f2bd;
+    }
 </style>
 <body style="margin: 0; padding: 0;">
 <div id="app">
     <div class="wrapper">
+        <p>
+            VueJs powerful but simple pagination component which is fully customizable and easy to use.<br/>
+            Pagination | Customizable |
+        </p>
         <div class="nav">
             <img src="logo.png"/>
             <div class="nav-wrapper">
@@ -167,6 +186,12 @@
                    @click="setNavActive('ex-hide')"
                    :class="{ active: nav.active === 'ex-hide'}">
                     &nbsp;&nbsp;&nbsp;&nbsp;Hide elements
+                </a>
+                <br/>
+                <a href="#ex-events"
+                   @click="setNavActive('ex-events')"
+                   :class="{ active: nav.active === 'ex-events'}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;Events
                 </a>
                 <br/>
             </div>
@@ -198,8 +223,7 @@
                 <p v-html="content[example1.pagination.page - 1]"></p>
             </div>
             <div class="result"><b>RESULT:</b> 3 pages are shown before the current page and 0 after. </div>
-            <flex-pagination :pagination="example1.pagination"
-                             v-on:flexp:page="example1PageUpdated">
+            <flex-pagination :pagination="example1.pagination">
     <!--            <template v-slot:flexp-first>-->
     <!--                <h1>Here might be a page title</h1>-->
     <!--            </template>-->
@@ -252,6 +276,7 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;<b>[prev]</b> type (boolean) default true;<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;<b>[next]</b> type (boolean) default true;<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;<b>[last]</b> type (boolean) default true;<br/>
+                <b>[event]</b> type (string) default 'flexp:page';
             </div>
             <div class="clear"></div>
 
@@ -287,6 +312,58 @@
             <flex-pagination :pagination="example3.pagination" :config="example3.config"></flex-pagination>
             <div class="clear"></div>
 
+
+
+            <div class="example-title" id="ex-events">
+                <span class="light-blue">Events</span>
+            </div>
+            <div class="note">
+                Each time you navigate on pagination an event is emitted which can be used to update pagination.
+                By default event name is 'flexp:page'. You can define a custom event name using config
+                <b>[event]</b> property.<br/>
+                <b>[event]</b> type (string) default 'flexp:page';<br/><br/>
+                <b>NOTE:</b> The event handler will receive selected page number in the first parameter.
+            </div>
+            <div class="code">
+                &lt;flex-pagination
+                <span class="blue">:pagination</span>="<b>pagination</b>"
+                <span class="event">:v-on:my:custom:event</span>="<span class="prop"><b>myEventHandler</b></span>"
+                <span class="blue">:config</span>="<span class="prop"><b>config</b></span>"&gt;...
+            </div>
+            <div class="code">
+                data: { <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;pagination: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;page: {{ this.example4.pagination.page }},<br/><br/>
+                <span class="comment">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// NOTE: total pages will be updated just after request finished. <br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// For demonstration purpose, a random number will be taken in between 40 and 50.<br/>
+                </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;total: {{ this.example4.pagination.total }}
+                <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;},<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;currentPageContent: ''<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;config: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="prop"><b>event</b></span>: <span class="event">'my:custom:event'</span><br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;},<br/>
+                }<br/>
+                methods: { <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="prop"><b>myEventHandler</b></span>(pageNumber) {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let <b>self</b> = this;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.<b>makeRequest</b>(pageNumber).<b>then</b>(function(response){<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.currentPageContent = response.data;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+                }<br/><br/>
+            </div>
+            <div class="example">
+                <div class="loader" v-if="example4.isLoading">
+                    This is dummy loader to emulate "request" timeout ...<br/>
+                    <img src="loader.gif"/>
+                </div>
+                <p v-if="!example4.isLoading" v-html="example4.pageContent"></p>
+            </div>
+            <flex-pagination :pagination="example4.pagination" v-on:my:custom:event="ex4LoadPage" :config="example4.config"></flex-pagination>
+            <div class="clear"></div>
 
 
 
@@ -338,15 +415,15 @@
                     }
                 },
                 example4: {
+                    loadPageTimeout: null,
+                    isLoading: false,
+                    pageContent: '',
                     pagination: {
                         page: 10,
                         total: totalPages,
                     },
                     config: {
-                        scroll: {
-                            prefix: 'page-id-prefix-'
-                        },
-                        eventName: 'my-custom-event'
+                        event: 'my:custom:event'
                     }
                 },
                 totalPages: totalPages,
@@ -399,14 +476,28 @@
                 this.nav.active = id;
             },
 
-            example1PageUpdated(page) {
-                console.dir(page);
+            ex4LoadPage(page) {
+                let self = this;
+                this.example4.isLoading = true;
+                clearTimeout(this.example4.loadPageTimeout);
+                this.example4.loadPageTimeout = setTimeout(function() {
+                    self.example4.isLoading = false;
+                    let total = self.getRandomNumber(40, 50);
+                    total = page > total ? page : total;
+                    self.example4.pagination.total = total;
+                    self.updateEx4Page(page);
+                }, 5000);
+            },
+
+            updateEx4Page(page) {
+                this.example4.pageContent = "<b>Page " + page + "</b><br/><br/>" + this.content[page - 1];
             },
         },
 
         mounted() {
-            this.nav.active = window.location.hash.substr(1);
             this.setContent();
+            this.nav.active = window.location.hash.substr(1);
+            this.ex4LoadPage(this.example4.pagination.page);
         }
     });
 </script>

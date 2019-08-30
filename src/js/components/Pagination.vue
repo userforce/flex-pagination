@@ -35,9 +35,7 @@
                             next: true,
                             prev: true
                         },
-                        scroll: {
-                            prefix: null
-                        }
+                        event: 'flexp:page'
                     }
                 }
             }
@@ -93,10 +91,10 @@
             setPage(page) {
                 if (this.pagination.page !== page) {
                     this.pagination.page = page;
-                    this.$emit('flexp:page', this.pagination.page);
+                    let event = this.config.event ? this.config.event : this.default.config.event;
+                    this.$emit(event, this.pagination.page);
                 }
             }
-
         }
     }
 </script>
