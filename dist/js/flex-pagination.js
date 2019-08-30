@@ -1,6 +1,6 @@
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?module.exports=f():typeof define==='function'&&define.amd?define(f):(g=g||self,g.FlexPagination=f());}(this,function(){'use strict';let Helpers = function() {
 
-    this.hasInnerProperty = function(object, path) {
+    this.hasInnerProperty = function(object = {}, path) {
         let nodes = path.split('.');
         if (nodes.length > 1) {
             let firstNode = nodes.shift();
@@ -15,6 +15,14 @@
 
     this.isValidClassName = function(string) {
         return !!string.match(/^[a-zA-Z][a-zA-Z_\-\d.]+$/gi);
+    };
+
+    this.rangeToArray = function(start, end) {
+        let arrayRange = [];
+        for (let i = start; i <= end; i++) {
+            arrayRange.push(i);
+        }
+        return arrayRange;
     };
 };
 
@@ -32,17 +40,13 @@ var helpers = new Helpers();let Validator = function() {
 
     let isNumber = function(value, name) {
         let isValid = !!value.toString().match(/^[\d.]+$/g);
-        if (!isValid) {
-            console.error(name + " must be of type Number.");
-        }
+        if (!isValid) console.error(name + " must be of type Number.");
         return isValid;
     };
 
     let isBoolean = function(value, name) {
         let isValid = !!(typeof value === "boolean");
-        if (!isValid) {
-            console.error(name + " must be of type Boolean.");
-        }
+        if (!isValid) console.error(name + " must be of type Boolean.");
         return isValid;
     };
 
@@ -68,7 +72,10 @@ var helpers = new Helpers();let Validator = function() {
 
     self.isValidPagination = function (pagination = {}) {
         if (typeof pagination === "object") {
-            return isValidPage(pagination) && isValidTotal(pagination);
+            if (isValidPage(pagination) && isValidTotal(pagination)) {
+                if (pagination.page <= pagination.total) return true;
+                console.error("pagination.page can't be bigger then pagination.total.");
+            }
         }
         return false;
     };
@@ -103,18 +110,6 @@ var helpers = new Helpers();let Validator = function() {
         }
 
         return isValid;
-    };
-
-
-
-
-
-
-
-
-
-    self.isValidAnchor = function (anchor = '') {
-        return true;
     };
 
 };
@@ -159,8 +154,31 @@ var validator = new Validator();var script = {
             }
         }
     },
+    computed: {
+        normalizedPage() {
+            return this.pagination.page > this.pagination.total ? this.pagination.total : this.pagination.page;
+        }
+    },
     methods: {
-
+        getShow(to) {
+            return helpers.hasInnerProperty(this.config, 'show.'+to) ? this.config.show[to] : this.default.config.show[to];
+        },
+        getRangeLength(position) {
+            return helpers.hasInnerProperty(this.range, position) ? this.range[position] : this.default.range[position];
+        },
+        getRangeBefore() {
+            let start = this.pagination.page - this.getRangeLength('before');
+            start = start < 1 ? 1 : start;
+            let end = this.pagination.page - 1;
+            return helpers.rangeToArray(start, end);
+        },
+        getRangeAfter() {
+            let end = this.pagination.page + this.getRangeLength('after');
+            end = end > this.pagination.total ? this.pagination.total : end;
+            let start = this.pagination.page + 1;
+            start = this.pagination.page >= this.pagination.total ? this.pagination.page + 1 : start;
+            return helpers.rangeToArray(start, end);
+        },
     },
     mounted() {
 
@@ -248,7 +266,60 @@ var validator = new Validator();var script = {
   return script;
 }
 
-var normalizeComponent_1 = normalizeComponent;/* script */
+var normalizeComponent_1 = normalizeComponent;var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\\b/.test(navigator.userAgent.toLowerCase());
+function createInjector(context) {
+  return function (id, style) {
+    return addStyle(id, style);
+  };
+}
+var HEAD;
+var styles = {};
+
+function addStyle(id, css) {
+  var group = isOldIE ? css.media || 'default' : id;
+  var style = styles[group] || (styles[group] = {
+    ids: new Set(),
+    styles: []
+  });
+
+  if (!style.ids.has(id)) {
+    style.ids.add(id);
+    var code = css.source;
+
+    if (css.map) {
+      // https://developer.chrome.com/devtools/docs/javascript-debugging
+      // this makes source maps inside style tags work properly in Chrome
+      code += '\n/*# sourceURL=' + css.map.sources[0] + ' */'; // http://stackoverflow.com/a/26603875
+
+      code += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(css.map)))) + ' */';
+    }
+
+    if (!style.element) {
+      style.element = document.createElement('style');
+      style.element.type = 'text/css';
+      if (css.media) style.element.setAttribute('media', css.media);
+
+      if (HEAD === undefined) {
+        HEAD = document.head || document.getElementsByTagName('head')[0];
+      }
+
+      HEAD.appendChild(style.element);
+    }
+
+    if ('styleSheet' in style.element) {
+      style.styles.push(code);
+      style.element.styleSheet.cssText = style.styles.filter(Boolean).join('\n');
+    } else {
+      var index = style.ids.size - 1;
+      var textNode = document.createTextNode(code);
+      var nodes = style.element.childNodes;
+      if (nodes[index]) style.element.removeChild(nodes[index]);
+      if (nodes.length) style.element.insertBefore(textNode, nodes[index]);else style.element.appendChild(textNode);
+    }
+  }
+}
+
+var browser = createInjector;/* script */
 const __vue_script__ = script;
 
 /* template */
@@ -257,35 +328,120 @@ var __vue_render__ = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("div", { staticClass: "flexp" }, [
-    _c("ul", { staticClass: "flexp-nav" }, [
-      _c(
-        "li",
-        { staticClass: "flexp-btn flexp-first" },
-        [
-          _vm._t("flexpfirstcontent", [
-            _vm._v(
-              "\n                    slot default content\n                "
+    _c(
+      "ul",
+      { staticClass: "flexp-nav" },
+      [
+        _vm.getShow("first")
+          ? _c(
+              "li",
+              { staticClass: "flexp-btn flexp-first" },
+              [
+                _vm._t("flexp-first", [
+                  _c("div", { staticClass: "flexp-btn-icon" }, [
+                    _vm._v("\n                    First\n                ")
+                  ])
+                ])
+              ],
+              2
             )
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.getShow("prev")
+          ? _c(
+              "li",
+              { staticClass: "flexp-btn flexp-previous" },
+              [
+                _vm._t("flexp-previous", [
+                  _c("div", { staticClass: "flexp-btn-icon" }, [
+                    _vm._v("\n                    Previous\n                ")
+                  ])
+                ])
+              ],
+              2
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _vm._l(_vm.getRangeBefore(), function(iterator) {
+          return _c("li", { staticClass: "flexp-btn" }, [
+            _c("div", { staticClass: "flexp-btn-icon" }, [
+              _vm._v("\n                " + _vm._s(iterator) + "\n            ")
+            ])
           ])
-        ],
-        2
-      )
-    ])
+        }),
+        _vm._v(" "),
+        _c(
+          "li",
+          { staticClass: "flexp-btn flexp-page active" },
+          [
+            _vm._t("flexp-first", [
+              _vm._v(
+                "\n                " +
+                  _vm._s(_vm.normalizedPage) +
+                  "\n            "
+              )
+            ])
+          ],
+          2
+        ),
+        _vm._v(" "),
+        _vm._l(_vm.getRangeAfter(), function(iterator) {
+          return _c("li", { staticClass: "flexp-btn" }, [
+            _c("div", { staticClass: "flexp-btn-icon" }, [
+              _vm._v("\n                " + _vm._s(iterator) + "\n            ")
+            ])
+          ])
+        }),
+        _vm._v(" "),
+        _vm.getShow("next")
+          ? _c(
+              "li",
+              { staticClass: "flexp-btn flexp-next" },
+              [
+                _vm._t("flexp-next", [
+                  _c("div", { staticClass: "flexp-btn-icon" }, [
+                    _vm._v("\n                    Next\n                ")
+                  ])
+                ])
+              ],
+              2
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.getShow("last")
+          ? _c(
+              "li",
+              { staticClass: "flexp-btn flexp-last" },
+              [
+                _vm._t("flexp-first", [
+                  _c("div", { staticClass: "flexp-btn-icon" }, [
+                    _vm._v("\n                    Last\n                ")
+                  ])
+                ])
+              ],
+              2
+            )
+          : _vm._e()
+      ],
+      2
+    )
   ])
 };
 var __vue_staticRenderFns__ = [];
 __vue_render__._withStripped = true;
 
   /* style */
-  const __vue_inject_styles__ = undefined;
+  const __vue_inject_styles__ = function (inject) {
+    if (!inject) return
+    inject("data-v-7494a5d6_0", { source: "\n.flexp li, .flexp ul {\n    display: block;\n    padding: 0;\n    margin: 0;\n    list-style: none;\n}\n.flexp li {\n    border: 1px solid #cccccc;\n    cursor: pointer;\n    padding: 3px 11px;\n    background: rgba(255,255,255,1);\n    float: left;\n    margin: 0 2px 0 0;\n}\n.flexp li:hover, .flexp li.active {\n    color: #777777;\n    background: rgba(0,0,0,.08);\n}\n.flexp li.active {\n    cursor: default;\n}\n", map: {"version":3,"sources":["/home/vagrant/code/flex-pagination/src/js/components/Pagination.vue"],"names":[],"mappings":";AAwKA;IACA,cAAA;IACA,UAAA;IACA,SAAA;IACA,gBAAA;AACA;AAEA;IACA,yBAAA;IACA,eAAA;IACA,iBAAA;IACA,+BAAA;IACA,WAAA;IACA,iBAAA;AACA;AAEA;IACA,cAAA;IACA,2BAAA;AACA;AAEA;IACA,eAAA;AACA","file":"Pagination.vue","sourcesContent":["<script>\r\n    import validator from '../utils/validator';\r\n    import helpers from '../utils/helpers';\r\n\r\n    export default {\r\n        name: 'flex-pagination',\r\n        props: {\r\n            pagination: {\r\n                type: Object,\r\n                required: true,\r\n                validator: validator.isValidPagination\r\n            },\r\n            range: {\r\n                type: Object,\r\n                required: false,\r\n                validator: validator.isValidRange\r\n            },\r\n            config: {\r\n                type: Object,\r\n                required: false,\r\n                validator: validator.isValidConfig\r\n            }\r\n        },\r\n        data() {\r\n            return {\r\n                default: {\r\n                    range: {\r\n                        before: 5,\r\n                        after: 5\r\n                    },\r\n                    config: {\r\n                        show: {\r\n                            first: true,\r\n                            last: true,\r\n                            next: true,\r\n                            prev: true\r\n                        },\r\n                        scroll: {\r\n                            prefix: null\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        },\r\n        computed: {\r\n            normalizedPage() {\r\n                return this.pagination.page > this.pagination.total ? this.pagination.total : this.pagination.page;\r\n            }\r\n        },\r\n        methods: {\r\n            getShow(to) {\r\n                return helpers.hasInnerProperty(this.config, 'show.'+to) ? this.config.show[to] : this.default.config.show[to];\r\n            },\r\n            getRangeLength(position) {\r\n                return helpers.hasInnerProperty(this.range, position) ? this.range[position] : this.default.range[position];\r\n            },\r\n            getRangeBefore() {\r\n                let start = this.pagination.page - this.getRangeLength('before');\r\n                start = start < 1 ? 1 : start;\r\n                let end = this.pagination.page - 1;\r\n                return helpers.rangeToArray(start, end);\r\n            },\r\n            getRangeAfter() {\r\n                let end = this.pagination.page + this.getRangeLength('after');\r\n                end = end > this.pagination.total ? this.pagination.total : end;\r\n                let start = this.pagination.page + 1;\r\n                start = this.pagination.page >= this.pagination.total ? this.pagination.page + 1 : start;\r\n                return helpers.rangeToArray(start, end);\r\n            },\r\n        },\r\n        mounted() {\r\n\r\n        }\r\n    }\r\n</script>\r\n\r\n<template>\r\n    <div class=\"flexp\">\r\n        <ul class=\"flexp-nav\">\r\n\r\n            <li class=\"flexp-btn flexp-first\"\r\n                v-if=\"getShow('first')\">\r\n                <slot name=\"flexp-first\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        First\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n            <li class=\"flexp-btn flexp-previous\"\r\n                v-if=\"getShow('prev')\">\r\n                <slot name=\"flexp-previous\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        Previous\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n            <li class=\"flexp-btn\"\r\n                v-for=\"iterator in getRangeBefore()\">\r\n                <div class=\"flexp-btn-icon\">\r\n                    {{ iterator }}\r\n                </div>\r\n            </li>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n            <li class=\"flexp-btn flexp-page active\">\r\n                <slot name=\"flexp-first\">\r\n                    {{ normalizedPage }}\r\n                </slot>\r\n            </li>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n            <li class=\"flexp-btn\"\r\n                v-for=\"iterator in getRangeAfter()\">\r\n                <div class=\"flexp-btn-icon\">\r\n                    {{ iterator }}\r\n                </div>\r\n            </li>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n            <li class=\"flexp-btn flexp-next\"\r\n                v-if=\"getShow('next')\">\r\n                <slot name=\"flexp-next\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        Next\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n            <li class=\"flexp-btn flexp-last\"\r\n                v-if=\"getShow('last')\">\r\n                <slot name=\"flexp-first\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        Last\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n        </ul>\r\n    </div>\r\n</template>\r\n\r\n<style>\r\n    .flexp li, .flexp ul {\r\n        display: block;\r\n        padding: 0;\r\n        margin: 0;\r\n        list-style: none;\r\n    }\r\n\r\n    .flexp li {\r\n        border: 1px solid #cccccc;\r\n        cursor: pointer;\r\n        padding: 3px 11px;\r\n        background: rgba(255,255,255,1);\r\n        float: left;\r\n        margin: 0 2px 0 0;\r\n    }\r\n\r\n    .flexp li:hover, .flexp li.active {\r\n        color: #777777;\r\n        background: rgba(0,0,0,.08);\r\n    }\r\n\r\n    .flexp li.active {\r\n        cursor: default;\r\n    }\r\n</style>"]}, media: undefined });
+
+  };
   /* scoped */
   const __vue_scope_id__ = undefined;
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
   const __vue_is_functional_template__ = false;
-  /* style inject */
-  
   /* style inject SSR */
   
 
@@ -297,6 +453,6 @@ __vue_render__._withStripped = true;
     __vue_scope_id__,
     __vue_is_functional_template__,
     __vue_module_identifier__,
-    undefined,
+    browser,
     undefined
   );return FlexPagination;}));
