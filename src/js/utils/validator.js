@@ -14,17 +14,13 @@ let Validator = function() {
 
     let isNumber = function(value, name) {
         let isValid = !!value.toString().match(/^[\d.]+$/g);
-        if (!isValid) {
-            console.error(name + " must be of type Number.");
-        }
+        if (!isValid) console.error(name + " must be of type Number.");
         return isValid;
     };
 
     let isBoolean = function(value, name) {
         let isValid = !!(typeof value === "boolean");
-        if (!isValid) {
-            console.error(name + " must be of type Boolean.");
-        }
+        if (!isValid) console.error(name + " must be of type Boolean.");
         return isValid;
     };
 
@@ -50,7 +46,10 @@ let Validator = function() {
 
     self.isValidPagination = function (pagination = {}) {
         if (typeof pagination === "object") {
-            return isValidPage(pagination) && isValidTotal(pagination);
+            if (isValidPage(pagination) && isValidTotal(pagination)) {
+                if (pagination.page <= pagination.total) return true;
+                console.error("pagination.page can't be bigger then pagination.total.");
+            }
         }
         return false;
     };

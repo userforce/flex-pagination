@@ -34,6 +34,38 @@
         color: black;
         font-family: 'Lexend Deca', sans-serif;
     }
+
+    .flexp * {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 14px;
+    }
+
+    .footer{
+        height: 150px;
+    }
+
+    .light-blue {
+        color: #3095ba;
+    }
+
+    .code {
+        border-radius: 4px 4px 4px 4px;
+        -moz-border-radius: 4px 4px 4px 4px;
+        -webkit-border-radius: 4px 4px 4px 4px;
+        border: 0px solid #000000;
+        padding: 15px;
+        margin-bottom: 15px;
+        background: #f1f1f1;
+        font-family: 'Share Tech Mono', monospace;
+    }
+
+    .code .prop {
+        background: #ffeec4;
+    }
+
+    .code .blue {
+        color: #032bf2;
+    }
 </style>
 <body style="margin: 0; padding: 0;">
 <div id="app">
@@ -42,17 +74,33 @@
     <div style="width: 1200px; margin: 0 auto;">
 
         <div class="example-title">
-            Default configuration example
+            Example: <span class="light-blue">regular</span>
+        </div>
+        <div class="code">
+            <span class="blue">import</span> FlexPagination <span class="blue">from</span> 'flex-pagination';
+        </div>
+        <div class="code">
+            &lt;flex-pagination <span class="blue">:pagination</span>="<span class="prop"><b>pagination</b></span>"&gt;&lt;/flex-pagination&gt;
+        </div>
+        <div class="code">
+            <span class="prop"><b>pagination</b></span>: { <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;page: {{ example1.pagination.page }}, <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;total: {{ totalPages }} <br/>
+            },
         </div>
         <div class="example">
             <b>Page {{ example1.pagination.page }}</b><br/>
             <p v-html="content[example1.pagination.page]"></p>
         </div>
+        <br/>
         <flex-pagination :pagination="example1.pagination">
-
+<!--            <template v-slot:flexp-first>-->
+<!--                <h1>Here might be a page title</h1>-->
+<!--            </template>-->
         </flex-pagination>
 
     </div>
+    <div class="footer"></div>
 </div>
 <script type="text/javascript">
     new Vue({
@@ -63,18 +111,20 @@
         },
 
         data() {
+            let totalPages = 50;
+
             return {
                 content: [],
                 example1: {
                     pagination: {
-                        page: 1,
-                        total: 50,
+                        page: 32,
+                        total: totalPages,
                     },
                 },
                 example2: {
                     pagination: {
                         page: 1,
-                        total: 50,
+                        total: totalPages,
                     },
                     range: {
                         before: 5,
@@ -84,18 +134,27 @@
                 example3: {
                     pagination: {
                         page: 1,
-                        total: 50,
+                        total: totalPages,
                     },
                     range: {
                         before: 5,
                         after: 5
                     },
                     config: {
+                        show: {
+                            first: false,
+                            last: false,
+                            next: true,
+                            prev: true
+                        },
                         scroll: {
                             prefix: 'page-id-prefix-'
-                        }
+                        },
+                        arrowColor: 'red',
+                        eventName: 'my-custom-event'
                     }
-                }
+                },
+                totalPages: totalPages,
             };
         },
 
@@ -103,7 +162,7 @@
 
             setContent() {
                 let content = [];
-                for (let i = 1; i < 5; i++) {
+                for (let i = 1; i <= this.totalPages; i++) {
                     content.push(this.getText());
                 }
                 this.content = content;
