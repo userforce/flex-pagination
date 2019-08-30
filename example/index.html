@@ -6,17 +6,57 @@
     <title>Flex Pagination</title>
 </head>
 <style>
-    @import url('https://fonts.googleapis.com/css?family=Lexend+Deca&Share+Tech+Mono&display=swap');
+    @import url('https://fonts.googleapis.com/css?family=Inconsolata|Source+Sans+Pro&display=swap');
+
+    .wrapper, .wrapper * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .wrapper {
+        width: 1200px;
+        padding: 0 0 0 250px;
+        position: relative;
+        margin: 0 auto;
+        font-family: 'Source Sans Pro', sans-serif;
+    }
+
+    .nav {
+        position: fixed;
+        left: 50%;
+        top: 0;
+        width: 250px;
+        padding: 15px;
+        margin: 0 0 0 -600px;
+    }
+    .nav .nav-wrapper {
+        height: 100%;
+        padding: 15px 15px 15px 0;
+    }
+
+    a {
+        text-decoration: none;
+        color: #3586d1;
+    }
+
+    a:hover {
+        color: #d35c5c;
+    }
+
+    a.active {
+        color: #cccccc;
+    }
 
     .example {
-        height: 350px;
+        height: 250px;
         -webkit-box-shadow: 0px 7px 15px 0px rgba(0, 0, 0, 0.05);
         -moz-box-shadow: 0px 7px 15px 0px rgba(0, 0, 0, 0.05);
         box-shadow: 0px 7px 15px 0px rgba(0, 0, 0, 0.05);
+        border: 1px solid #cccccc;
         padding: 15px 55px 15px 15px;
-        font-size: 14px;
         overflow: auto;
-        font-family: 'Share Tech Mono', monospace;
+        margin-bottom: 15px;
     }
 
     .example p {
@@ -28,35 +68,28 @@
     }
 
     .example-title {
-        border-bottom: 1px solid #000;
-        margin-bottom: 15px;
-        font-size: 20px;
-        color: black;
-        font-family: 'Lexend Deca', sans-serif;
-    }
-
-    .flexp * {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 14px;
+        border-bottom: 1px solid #cccccc;
+        margin: 0 0 15px 0;
+        padding-top: 15px;
+        font-size: 28px;
+        color: #555555;
+        font-weight: bold;
     }
 
     .footer{
         height: 150px;
     }
 
-    .light-blue {
-        color: #3095ba;
-    }
-
-    .code {
+    .code, .note {
         border-radius: 4px 4px 4px 4px;
         -moz-border-radius: 4px 4px 4px 4px;
         -webkit-border-radius: 4px 4px 4px 4px;
-        border: 0px solid #000000;
         padding: 15px;
         margin-bottom: 15px;
-        background: #f1f1f1;
-        font-family: 'Share Tech Mono', monospace;
+        background: #f8f8f8;
+        border: 1px solid #f1f1f1;
+        font-size: 16px;
+        font-family: 'Inconsolata', monospace;
     }
 
     .code .prop {
@@ -66,39 +99,275 @@
     .code .blue {
         color: #032bf2;
     }
+
+    .code .comment {
+        color: #888888;
+    }
+
+    .note {
+        background: #fff7f0;
+        font-size: 14px;
+        line-height: 18px;
+        color: #777777;
+    }
+
+    .note b {
+        color: #0d5982;
+    }
+
+    .flexp li.flexp-range-after, .flexp li.flexp-range-before {
+        background: #f8f8f8;
+    }
+
+    .flexp li.flexp-range-after, .flexp li.flexp-range-before {
+        background: #f8f8f8;
+    }
+
+    .clear {
+        clear: both;
+        margin-bottom: 75px;
+    }
+
+    .result {
+        border-radius: 4px 4px 4px 4px;
+        -moz-border-radius: 4px 4px 4px 4px;
+        -webkit-border-radius: 4px 4px 4px 4px;
+        border: 0px solid #000000;
+        background: #def2dc;
+        color: #278020;
+        margin: 0 0 15px 0;
+        padding: 5px 15px;
+    }
+
+    .result b {
+        padding-right: 5px;
+    }
+    
+    .loader {
+        padding-top: 15px;
+        font-size: 20px;
+        color: #777777;
+        text-align: center;
+    }
+
+    .event {
+        background: #d2f2bd;
+    }
 </style>
 <body style="margin: 0; padding: 0;">
 <div id="app">
-    <br/>
-    <br/>
-    <div style="width: 1200px; margin: 0 auto;">
+    <div class="wrapper">
+        <p>
+            VueJs powerful but simple pagination component which is fully customizable and easy to use.<br/>
+            Pagination | Customizable |
+        </p>
+        <div class="nav">
+            <img src="logo.png"/>
+            <div class="nav-wrapper">
+                <a href="#ex-default"
+                   @click="setNavActive('ex-default')"
+                   :class="{ active: nav.active === 'ex-default'}">
+                    Basic example
+                </a>
+                <br/>
+                <a href="#ex-ranges"
+                   @click="setNavActive('ex-ranges')"
+                   :class="{ active: nav.active === 'ex-ranges'}">
+                    Ranges
+                </a>
+                <br/>
+                <a href="#ex-config"
+                   @click="setNavActive('ex-config')"
+                   :class="{ active: nav.active === 'ex-config'}">
+                    Configuration
+                </a>
+                <br/>
+                <a href="#ex-hide"
+                   @click="setNavActive('ex-hide')"
+                   :class="{ active: nav.active === 'ex-hide'}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;Hide elements
+                </a>
+                <br/>
+                <a href="#ex-events"
+                   @click="setNavActive('ex-events')"
+                   :class="{ active: nav.active === 'ex-events'}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;Events
+                </a>
+                <br/>
+            </div>
+        </div>
+        <div class="content">
 
-        <div class="example-title">
-            Example: <span class="light-blue">regular</span>
-        </div>
-        <div class="code">
-            <span class="blue">import</span> FlexPagination <span class="blue">from</span> 'flex-pagination';
-        </div>
-        <div class="code">
-            &lt;flex-pagination <span class="blue">:pagination</span>="<span class="prop"><b>pagination</b></span>"&gt;&lt;/flex-pagination&gt;
-        </div>
-        <div class="code">
-            <span class="prop"><b>pagination</b></span>: { <br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;page: {{ example1.pagination.page }}, <br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;total: {{ totalPages }} <br/>
-            },
-        </div>
-        <div class="example">
-            <b>Page {{ example1.pagination.page }}</b><br/>
-            <p v-html="content[example1.pagination.page]"></p>
-        </div>
-        <br/>
-        <flex-pagination :pagination="example1.pagination">
-<!--            <template v-slot:flexp-first>-->
-<!--                <h1>Here might be a page title</h1>-->
-<!--            </template>-->
-        </flex-pagination>
+            <div class="example-title" id="ex-default">
+                <span class="light-blue">Basic example</span>
+            </div>
+            <div class="note">
+                Flex pagination requires <b>[:pagination=""]</b> property which must be of type object and have 2 child properties.<br/>
+                <b>[page]</b> type (int) which is current active page; <br/>
+                <b>[total]</b> type (int) which is total amount of pages;
+            </div>
+            <div class="code">
+                <span class="blue">import</span> FlexPagination <span class="blue">from</span> 'flex-pagination';
+            </div>
+            <div class="code">
+                &lt;flex-pagination <span class="blue">:pagination</span>="<span class="prop"><b>pagination</b></span>"&gt;&lt;/flex-pagination&gt;
+            </div>
+            <div class="code">
+                <span class="prop"><b>pagination</b></span>: { <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;page: {{ example1.pagination.page }}, <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;total: {{ totalPages }} <br/>
+                }
+            </div>
+            <div class="example">
+                <b>Page {{ example1.pagination.page }}</b><br/>
+                <p v-html="content[example1.pagination.page - 1]"></p>
+            </div>
+            <div class="result"><b>RESULT:</b> 3 pages are shown before the current page and 0 after. </div>
+            <flex-pagination :pagination="example1.pagination">
+    <!--            <template v-slot:flexp-first>-->
+    <!--                <h1>Here might be a page title</h1>-->
+    <!--            </template>-->
+            </flex-pagination>
+            <div class="clear"></div>
 
+
+
+            <div class="example-title" id="ex-ranges">
+                <span class="light-blue">Ranges</span>
+            </div>
+            <div class="note">
+                Optional property <b>[:range=""]</b> is defining how many page are shown around current
+                page which are set to 5 by default.<br/>
+                <b>[before]</b> type (int) number of pages before current;<br/>
+                <b>[after]</b> type (int) number of pages after current;
+                <br/><br/>
+                <b>NOTE:</b> Ranges was pulled out of <a href="#ex-config">configuration</a> because of its frequent usage.
+            </div>
+            <div class="code">
+                &lt;flex-pagination
+                <span class="blue">:pagination</span>="<b>pagination</b>"
+                <span class="blue">:range</span>="<span class="prop"><b>range</b></span>"&gt;&lt;/flex-pagination&gt;
+            </div>
+            <div class="code">
+                <span class="prop"><b>range</b></span>: { <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;before: {{ example2.range.before }}, <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;after: {{ example2.range.after }} <br/>
+                }<br/><br/>
+            </div>
+            <div class="example">
+                <b>Page {{ example2.pagination.page }}</b><br/>
+                <p v-html="content[example2.pagination.page - 1]"></p>
+            </div>
+            <div class="result"><b>RESULT:</b> 3 pages are shown before the current page and 0 after. </div>
+            <flex-pagination :pagination="example2.pagination"
+                             :range="example2.range">
+            </flex-pagination>
+            <div class="clear"></div>
+
+
+
+            <div class="example-title" id="ex-config">
+                <span class="light-blue">Configuration</span>
+            </div>
+            <div class="note">
+                <b>[:config=""]</b> property is keeping other non required flex-pagination configuration properties.<br/>
+                <b><a href="#ex-hide">[show]</a></b> type (object) defines which visual elements must be hidden.<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<b>[first]</b> type (boolean) default true;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<b>[prev]</b> type (boolean) default true;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<b>[next]</b> type (boolean) default true;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<b>[last]</b> type (boolean) default true;<br/>
+                <b>[event]</b> type (string) default 'flexp:page';
+            </div>
+            <div class="clear"></div>
+
+
+
+            <div class="example-title" id="ex-hide">
+                <span class="light-blue">Hide elements</span>
+            </div>
+            <div class="note">
+                <b>[show]</b> property of the <b>[:config="]</b> object defines which visual elements must be hide or show.<br/>
+                <b>[first]</b>, <b>[prev]</b>, <b>[next]</b>, <b>[last]</b> type (boolean) default True;
+            </div>
+            <div class="code">
+                &lt;flex-pagination
+                <span class="blue">:pagination</span>="<b>pagination</b>"
+                <span class="blue">:config</span>="<span class="prop"><b>config</b></span>"&gt;&lt;/flex-pagination&gt;
+            </div>
+            <div class="code">
+                <span class="prop"><b>config</b></span>: { <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="prop"><b>show</b></span>: { <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;first: {{ example3.config.show.first }}, <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;last: {{ example3.config.show.last }}, <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;next: {{ example3.config.show.next }}, <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;prev: {{ example3.config.show.prev }}<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+                }<br/><br/>
+            </div>
+            <div class="example">
+                <b>Page {{ example3.pagination.page }}</b><br/>
+                <p v-html="content[example3.pagination.page - 1]"></p>
+            </div>
+            <div class="result"><b>RESULT:</b> first, previous and last buttons were hidden. </div>
+            <flex-pagination :pagination="example3.pagination" :config="example3.config"></flex-pagination>
+            <div class="clear"></div>
+
+
+
+            <div class="example-title" id="ex-events">
+                <span class="light-blue">Events</span>
+            </div>
+            <div class="note">
+                Each time you navigate on pagination an event is emitted which can be used to update pagination.
+                By default event name is 'flexp:page'. You can define a custom event name using config
+                <b>[event]</b> property.<br/>
+                <b>[event]</b> type (string) default 'flexp:page';<br/><br/>
+                <b>NOTE:</b> The event handler will receive selected page number in the first parameter.
+            </div>
+            <div class="code">
+                &lt;flex-pagination
+                <span class="blue">:pagination</span>="<b>pagination</b>"
+                <span class="event">:v-on:my:custom:event</span>="<span class="prop"><b>myEventHandler</b></span>"
+                <span class="blue">:config</span>="<span class="prop"><b>config</b></span>"&gt;...
+            </div>
+            <div class="code">
+                data: { <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;pagination: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;page: {{ this.example4.pagination.page }},<br/><br/>
+                <span class="comment">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// NOTE: total pages will be updated just after request finished. <br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// For demonstration purpose, a random number will be taken in between 40 and 50.<br/>
+                </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;total: {{ this.example4.pagination.total }}
+                <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;},<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;currentPageContent: ''<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;config: {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="prop"><b>event</b></span>: <span class="event">'my:custom:event'</span><br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;},<br/>
+                }<br/>
+                methods: { <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="prop"><b>myEventHandler</b></span>(pageNumber) {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let <b>self</b> = this;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.<b>makeRequest</b>(pageNumber).<b>then</b>(function(response){<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.currentPageContent = response.data;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+                }<br/><br/>
+            </div>
+            <div class="example">
+                <div class="loader" v-if="example4.isLoading">
+                    This is dummy loader to emulate "request" timeout ...<br/>
+                    <img src="loader.gif"/>
+                </div>
+                <p v-if="!example4.isLoading" v-html="example4.pageContent"></p>
+            </div>
+            <flex-pagination :pagination="example4.pagination" v-on:my:custom:event="ex4LoadPage" :config="example4.config"></flex-pagination>
+            <div class="clear"></div>
+
+
+
+        </div>
     </div>
     <div class="footer"></div>
 </div>
@@ -117,44 +386,50 @@
                 content: [],
                 example1: {
                     pagination: {
-                        page: 32,
+                        page: 10,
                         total: totalPages,
                     },
                 },
                 example2: {
                     pagination: {
-                        page: 1,
+                        page: 10,
                         total: totalPages,
                     },
                     range: {
-                        before: 5,
-                        after: 5
+                        before: 3,
+                        after: 0
                     },
                 },
                 example3: {
                     pagination: {
-                        page: 1,
+                        page: 10,
                         total: totalPages,
-                    },
-                    range: {
-                        before: 5,
-                        after: 5
                     },
                     config: {
                         show: {
                             first: false,
                             last: false,
                             next: true,
-                            prev: true
-                        },
-                        scroll: {
-                            prefix: 'page-id-prefix-'
-                        },
-                        arrowColor: 'red',
-                        eventName: 'my-custom-event'
+                            prev: false
+                        }
+                    }
+                },
+                example4: {
+                    loadPageTimeout: null,
+                    isLoading: false,
+                    pageContent: '',
+                    pagination: {
+                        page: 10,
+                        total: totalPages,
+                    },
+                    config: {
+                        event: 'my:custom:event'
                     }
                 },
                 totalPages: totalPages,
+                nav: {
+                    active: null
+                }
             };
         },
 
@@ -195,11 +470,34 @@
                 min = Math.ceil(min);
                 max = Math.floor(max);
                 return Math.floor(Math.random() * (max - min)) + min;
-            }
+            },
+
+            setNavActive(id) {
+                this.nav.active = id;
+            },
+
+            ex4LoadPage(page) {
+                let self = this;
+                this.example4.isLoading = true;
+                clearTimeout(this.example4.loadPageTimeout);
+                this.example4.loadPageTimeout = setTimeout(function() {
+                    self.example4.isLoading = false;
+                    let total = self.getRandomNumber(40, 50);
+                    total = page > total ? page : total;
+                    self.example4.pagination.total = total;
+                    self.updateEx4Page(page);
+                }, 5000);
+            },
+
+            updateEx4Page(page) {
+                this.example4.pageContent = "<b>Page " + page + "</b><br/><br/>" + this.content[page - 1];
+            },
         },
 
         mounted() {
             this.setContent();
+            this.nav.active = window.location.hash.substr(1);
+            this.ex4LoadPage(this.example4.pagination.page);
         }
     });
 </script>
