@@ -6,7 +6,11 @@
     <title>Flex Pagination</title>
 </head>
 <style>
-    @import url('https://fonts.googleapis.com/css?family=Lexend+Deca&Share+Tech+Mono&display=swap');
+    @import url('https://fonts.googleapis.com/css?family=Inconsolata|Source+Sans+Pro&display=swap');
+
+    body {
+        font-family: 'Source Sans Pro', sans-serif;
+    }
 
     .example {
         height: 350px;
@@ -14,9 +18,7 @@
         -moz-box-shadow: 0px 7px 15px 0px rgba(0, 0, 0, 0.05);
         box-shadow: 0px 7px 15px 0px rgba(0, 0, 0, 0.05);
         padding: 15px 55px 15px 15px;
-        font-size: 14px;
         overflow: auto;
-        font-family: 'Share Tech Mono', monospace;
     }
 
     .example p {
@@ -29,34 +31,25 @@
 
     .example-title {
         border-bottom: 1px solid #000;
-        margin-bottom: 15px;
-        font-size: 20px;
+        margin: 75px 0 15px 0;
+        font-size: 24px;
         color: black;
-        font-family: 'Lexend Deca', sans-serif;
-    }
-
-    .flexp * {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 14px;
     }
 
     .footer{
         height: 150px;
     }
 
-    .light-blue {
-        color: #3095ba;
-    }
-
-    .code {
+    .code, .note {
         border-radius: 4px 4px 4px 4px;
         -moz-border-radius: 4px 4px 4px 4px;
         -webkit-border-radius: 4px 4px 4px 4px;
-        border: 0px solid #000000;
         padding: 15px;
         margin-bottom: 15px;
-        background: #f1f1f1;
-        font-family: 'Share Tech Mono', monospace;
+        background: #f8f8f8;
+        border: 1px solid #f1f1f1;
+        font-size: 16px;
+        font-family: 'Inconsolata', monospace;
     }
 
     .code .prop {
@@ -66,15 +59,32 @@
     .code .blue {
         color: #032bf2;
     }
+
+    .note {
+        background: #fff7f0;
+        font-size: 14px;
+        line-height: 18px;
+        color: #777777;
+    }
+
+    .note b {
+        color: #0d5982;
+    }
+
+    .flexp li.flexp-range-after, .flexp li.flexp-range-before {
+        background: #f8f8f8;
+    }
 </style>
 <body style="margin: 0; padding: 0;">
 <div id="app">
-    <br/>
-    <br/>
     <div style="width: 1200px; margin: 0 auto;">
-
         <div class="example-title">
-            Example: <span class="light-blue">regular</span>
+            <span class="light-blue">Default configuration</span>
+        </div>
+        <div class="note">
+            Flex pagination requires <b>[:pagination=""]</b> property which must be of type object and have 2 child properties.<br/>
+            <b>[page]</b> type (int) which is current active page; <br/>
+            <b>[total]</b> type (int) which is total amount of pages;
         </div>
         <div class="code">
             <span class="blue">import</span> FlexPagination <span class="blue">from</span> 'flex-pagination';
@@ -86,18 +96,58 @@
             <span class="prop"><b>pagination</b></span>: { <br/>
             &nbsp;&nbsp;&nbsp;&nbsp;page: {{ example1.pagination.page }}, <br/>
             &nbsp;&nbsp;&nbsp;&nbsp;total: {{ totalPages }} <br/>
-            },
+            }
         </div>
         <div class="example">
             <b>Page {{ example1.pagination.page }}</b><br/>
-            <p v-html="content[example1.pagination.page]"></p>
+            <p v-html="content[example1.pagination.page - 1]"></p>
         </div>
         <br/>
-        <flex-pagination :pagination="example1.pagination">
+        <flex-pagination :pagination="example1.pagination"
+                         v-on:flexp:page="example1PageUpdated">
 <!--            <template v-slot:flexp-first>-->
 <!--                <h1>Here might be a page title</h1>-->
 <!--            </template>-->
         </flex-pagination>
+        <div style="clear: both;"></div>
+
+        <div class="example-title">
+            <span class="light-blue">Ranges</span>
+        </div>
+        <div class="note">
+            <b>[:range=""]</b> property is defining how many page buttons to show <b>[before]</b> or <b>[after]</b> current page.
+            <br/><br/>
+            <b>NOTE:</b> By default ranges: [before] and [after] are set to 5.
+        </div>
+        <div class="code">
+            &lt;flex-pagination
+            <span class="blue">:pagination</span>="<b>pagination</b>"
+            <span class="blue">:range</span>="<span class="prop"><b>range</b></span>"&gt;&lt;/flex-pagination&gt;
+        </div>
+        <div class="code">
+            <span class="prop"><b>range</b></span>: { <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;before: {{ example2.range.before }}, <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;after: {{ example2.range.after }} <br/>
+            }<br/><br/>
+        </div>
+        <div class="example">
+            <b>Page {{ example2.pagination.page }}</b><br/>
+            <p v-html="content[example2.pagination.page - 1]"></p>
+        </div>
+        <br/>
+        <flex-pagination :pagination="example2.pagination"
+                         :range="example2.range"
+                         v-on:flexp:page="example1PageUpdated">
+            <!--            <template v-slot:flexp-first>-->
+            <!--                <h1>Here might be a page title</h1>-->
+            <!--            </template>-->
+        </flex-pagination>
+
+
+
+
+
+
 
     </div>
     <div class="footer"></div>
@@ -117,18 +167,18 @@
                 content: [],
                 example1: {
                     pagination: {
-                        page: 32,
+                        page: 10,
                         total: totalPages,
                     },
                 },
                 example2: {
                     pagination: {
-                        page: 1,
+                        page: 10,
                         total: totalPages,
                     },
                     range: {
-                        before: 5,
-                        after: 5
+                        before: 3,
+                        after: 0
                     },
                 },
                 example3: {
@@ -195,7 +245,12 @@
                 min = Math.ceil(min);
                 max = Math.floor(max);
                 return Math.floor(Math.random() * (max - min)) + min;
-            }
+            },
+
+            example1PageUpdated(page) {
+                console.dir(page);
+                console.dir(1);
+            },
         },
 
         mounted() {

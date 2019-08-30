@@ -155,23 +155,29 @@ var validator = new Validator();var script = {
         }
     },
     computed: {
+
         normalizedPage() {
             return this.pagination.page > this.pagination.total ? this.pagination.total : this.pagination.page;
         }
+
     },
     methods: {
+
         getShow(to) {
-            return helpers.hasInnerProperty(this.config, 'show.'+to) ? this.config.show[to] : this.default.config.show[to];
+            return helpers.hasInnerProperty(this.config, 'show.' + to) ? this.config.show[to] : this.default.config.show[to];
         },
+
         getRangeLength(position) {
             return helpers.hasInnerProperty(this.range, position) ? this.range[position] : this.default.range[position];
         },
+
         getRangeBefore() {
             let start = this.pagination.page - this.getRangeLength('before');
             start = start < 1 ? 1 : start;
             let end = this.pagination.page - 1;
             return helpers.rangeToArray(start, end);
         },
+
         getRangeAfter() {
             let end = this.pagination.page + this.getRangeLength('after');
             end = end > this.pagination.total ? this.pagination.total : end;
@@ -179,8 +185,29 @@ var validator = new Validator();var script = {
             start = this.pagination.page >= this.pagination.total ? this.pagination.page + 1 : start;
             return helpers.rangeToArray(start, end);
         },
-    },
-    mounted() {
+
+        getPrev() {
+            return this.hasPrev() ? this.pagination.page - 1 : this.pagination.page;
+        },
+
+        getNext() {
+            return this.hasNext() ? this.pagination.page + 1 : this.pagination.total;
+        },
+
+        hasPrev() {
+            return this.pagination.page - 1 > 0;
+        },
+
+        hasNext() {
+            return this.pagination.page + 1 <= this.pagination.total;
+        },
+
+        setPage(page) {
+            if (this.pagination.page !== page) {
+                this.pagination.page = page;
+                this.$emit('flexp:page', this.pagination.page);
+            }
+        }
 
     }
 };function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
@@ -335,7 +362,15 @@ var __vue_render__ = function() {
         _vm.getShow("first")
           ? _c(
               "li",
-              { staticClass: "flexp-btn flexp-first" },
+              {
+                staticClass: "flexp-btn flexp-first",
+                class: { disabled: !_vm.hasPrev() },
+                on: {
+                  click: function($event) {
+                    return _vm.setPage(1)
+                  }
+                }
+              },
               [
                 _vm._t("flexp-first", [
                   _c("div", { staticClass: "flexp-btn-icon" }, [
@@ -350,7 +385,15 @@ var __vue_render__ = function() {
         _vm.getShow("prev")
           ? _c(
               "li",
-              { staticClass: "flexp-btn flexp-previous" },
+              {
+                staticClass: "flexp-btn flexp-previous",
+                class: { disabled: !_vm.hasPrev() },
+                on: {
+                  click: function($event) {
+                    _vm.setPage(_vm.getPrev());
+                  }
+                }
+              },
               [
                 _vm._t("flexp-previous", [
                   _c("div", { staticClass: "flexp-btn-icon" }, [
@@ -363,11 +406,24 @@ var __vue_render__ = function() {
           : _vm._e(),
         _vm._v(" "),
         _vm._l(_vm.getRangeBefore(), function(iterator) {
-          return _c("li", { staticClass: "flexp-btn" }, [
-            _c("div", { staticClass: "flexp-btn-icon" }, [
-              _vm._v("\n                " + _vm._s(iterator) + "\n            ")
-            ])
-          ])
+          return _c(
+            "li",
+            {
+              staticClass: "flexp-btn flexp-range-before",
+              on: {
+                click: function($event) {
+                  return _vm.setPage(iterator)
+                }
+              }
+            },
+            [
+              _c("div", { staticClass: "flexp-btn-icon" }, [
+                _vm._v(
+                  "\n                " + _vm._s(iterator) + "\n            "
+                )
+              ])
+            ]
+          )
         }),
         _vm._v(" "),
         _c(
@@ -386,17 +442,38 @@ var __vue_render__ = function() {
         ),
         _vm._v(" "),
         _vm._l(_vm.getRangeAfter(), function(iterator) {
-          return _c("li", { staticClass: "flexp-btn" }, [
-            _c("div", { staticClass: "flexp-btn-icon" }, [
-              _vm._v("\n                " + _vm._s(iterator) + "\n            ")
-            ])
-          ])
+          return _c(
+            "li",
+            {
+              staticClass: "flexp-btn flexp-range-after",
+              on: {
+                click: function($event) {
+                  return _vm.setPage(iterator)
+                }
+              }
+            },
+            [
+              _c("div", { staticClass: "flexp-btn-icon" }, [
+                _vm._v(
+                  "\n                " + _vm._s(iterator) + "\n            "
+                )
+              ])
+            ]
+          )
         }),
         _vm._v(" "),
         _vm.getShow("next")
           ? _c(
               "li",
-              { staticClass: "flexp-btn flexp-next" },
+              {
+                staticClass: "flexp-btn flexp-next",
+                class: { disabled: !_vm.hasNext() },
+                on: {
+                  click: function($event) {
+                    _vm.setPage(_vm.getNext());
+                  }
+                }
+              },
               [
                 _vm._t("flexp-next", [
                   _c("div", { staticClass: "flexp-btn-icon" }, [
@@ -411,7 +488,15 @@ var __vue_render__ = function() {
         _vm.getShow("last")
           ? _c(
               "li",
-              { staticClass: "flexp-btn flexp-last" },
+              {
+                staticClass: "flexp-btn flexp-last",
+                class: { disabled: !_vm.hasNext() },
+                on: {
+                  click: function($event) {
+                    return _vm.setPage(_vm.pagination.total)
+                  }
+                }
+              },
               [
                 _vm._t("flexp-first", [
                   _c("div", { staticClass: "flexp-btn-icon" }, [
@@ -433,7 +518,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = function (inject) {
     if (!inject) return
-    inject("data-v-7494a5d6_0", { source: "\n.flexp li, .flexp ul {\n    display: block;\n    padding: 0;\n    margin: 0;\n    list-style: none;\n}\n.flexp li {\n    border: 1px solid #cccccc;\n    cursor: pointer;\n    padding: 3px 11px;\n    background: rgba(255,255,255,1);\n    float: left;\n    margin: 0 2px 0 0;\n}\n.flexp li:hover, .flexp li.active {\n    color: #777777;\n    background: rgba(0,0,0,.08);\n}\n.flexp li.active {\n    cursor: default;\n}\n", map: {"version":3,"sources":["/home/vagrant/code/flex-pagination/src/js/components/Pagination.vue"],"names":[],"mappings":";AAwKA;IACA,cAAA;IACA,UAAA;IACA,SAAA;IACA,gBAAA;AACA;AAEA;IACA,yBAAA;IACA,eAAA;IACA,iBAAA;IACA,+BAAA;IACA,WAAA;IACA,iBAAA;AACA;AAEA;IACA,cAAA;IACA,2BAAA;AACA;AAEA;IACA,eAAA;AACA","file":"Pagination.vue","sourcesContent":["<script>\r\n    import validator from '../utils/validator';\r\n    import helpers from '../utils/helpers';\r\n\r\n    export default {\r\n        name: 'flex-pagination',\r\n        props: {\r\n            pagination: {\r\n                type: Object,\r\n                required: true,\r\n                validator: validator.isValidPagination\r\n            },\r\n            range: {\r\n                type: Object,\r\n                required: false,\r\n                validator: validator.isValidRange\r\n            },\r\n            config: {\r\n                type: Object,\r\n                required: false,\r\n                validator: validator.isValidConfig\r\n            }\r\n        },\r\n        data() {\r\n            return {\r\n                default: {\r\n                    range: {\r\n                        before: 5,\r\n                        after: 5\r\n                    },\r\n                    config: {\r\n                        show: {\r\n                            first: true,\r\n                            last: true,\r\n                            next: true,\r\n                            prev: true\r\n                        },\r\n                        scroll: {\r\n                            prefix: null\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        },\r\n        computed: {\r\n            normalizedPage() {\r\n                return this.pagination.page > this.pagination.total ? this.pagination.total : this.pagination.page;\r\n            }\r\n        },\r\n        methods: {\r\n            getShow(to) {\r\n                return helpers.hasInnerProperty(this.config, 'show.'+to) ? this.config.show[to] : this.default.config.show[to];\r\n            },\r\n            getRangeLength(position) {\r\n                return helpers.hasInnerProperty(this.range, position) ? this.range[position] : this.default.range[position];\r\n            },\r\n            getRangeBefore() {\r\n                let start = this.pagination.page - this.getRangeLength('before');\r\n                start = start < 1 ? 1 : start;\r\n                let end = this.pagination.page - 1;\r\n                return helpers.rangeToArray(start, end);\r\n            },\r\n            getRangeAfter() {\r\n                let end = this.pagination.page + this.getRangeLength('after');\r\n                end = end > this.pagination.total ? this.pagination.total : end;\r\n                let start = this.pagination.page + 1;\r\n                start = this.pagination.page >= this.pagination.total ? this.pagination.page + 1 : start;\r\n                return helpers.rangeToArray(start, end);\r\n            },\r\n        },\r\n        mounted() {\r\n\r\n        }\r\n    }\r\n</script>\r\n\r\n<template>\r\n    <div class=\"flexp\">\r\n        <ul class=\"flexp-nav\">\r\n\r\n            <li class=\"flexp-btn flexp-first\"\r\n                v-if=\"getShow('first')\">\r\n                <slot name=\"flexp-first\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        First\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n            <li class=\"flexp-btn flexp-previous\"\r\n                v-if=\"getShow('prev')\">\r\n                <slot name=\"flexp-previous\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        Previous\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n            <li class=\"flexp-btn\"\r\n                v-for=\"iterator in getRangeBefore()\">\r\n                <div class=\"flexp-btn-icon\">\r\n                    {{ iterator }}\r\n                </div>\r\n            </li>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n            <li class=\"flexp-btn flexp-page active\">\r\n                <slot name=\"flexp-first\">\r\n                    {{ normalizedPage }}\r\n                </slot>\r\n            </li>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n            <li class=\"flexp-btn\"\r\n                v-for=\"iterator in getRangeAfter()\">\r\n                <div class=\"flexp-btn-icon\">\r\n                    {{ iterator }}\r\n                </div>\r\n            </li>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n            <li class=\"flexp-btn flexp-next\"\r\n                v-if=\"getShow('next')\">\r\n                <slot name=\"flexp-next\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        Next\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n            <li class=\"flexp-btn flexp-last\"\r\n                v-if=\"getShow('last')\">\r\n                <slot name=\"flexp-first\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        Last\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n        </ul>\r\n    </div>\r\n</template>\r\n\r\n<style>\r\n    .flexp li, .flexp ul {\r\n        display: block;\r\n        padding: 0;\r\n        margin: 0;\r\n        list-style: none;\r\n    }\r\n\r\n    .flexp li {\r\n        border: 1px solid #cccccc;\r\n        cursor: pointer;\r\n        padding: 3px 11px;\r\n        background: rgba(255,255,255,1);\r\n        float: left;\r\n        margin: 0 2px 0 0;\r\n    }\r\n\r\n    .flexp li:hover, .flexp li.active {\r\n        color: #777777;\r\n        background: rgba(0,0,0,.08);\r\n    }\r\n\r\n    .flexp li.active {\r\n        cursor: default;\r\n    }\r\n</style>"]}, media: undefined });
+    inject("data-v-34f4984b_0", { source: "\n.flexp li, .flexp ul {\n    display: block;\n    padding: 0;\n    margin: 0;\n    list-style: none;\n}\n.flexp li {\n    border: 1px solid #cccccc;\n    cursor: pointer;\n    padding: 3px 11px;\n    background: rgba(255, 255, 255, 1);\n    float: left;\n    margin: 0 2px 0 0;\n}\n.flexp li:hover, .flexp li.active, .flexp li.disabled {\n    background: rgba(0, 0, 0, .08);\n}\n.flexp li.disabled {\n    color: #cccccc;\n    background: #f8f8f8;\n}\n.flexp li.active, .flexp li.disabled {\n    cursor: default;\n}\n", map: {"version":3,"sources":["/home/vagrant/code/flex-pagination/src/js/components/Pagination.vue"],"names":[],"mappings":";AAkLA;IACA,cAAA;IACA,UAAA;IACA,SAAA;IACA,gBAAA;AACA;AAEA;IACA,yBAAA;IACA,eAAA;IACA,iBAAA;IACA,kCAAA;IACA,WAAA;IACA,iBAAA;AACA;AAEA;IACA,8BAAA;AACA;AAEA;IACA,cAAA;IACA,mBAAA;AACA;AAEA;IACA,eAAA;AACA","file":"Pagination.vue","sourcesContent":["<script>\r\n    import validator from '../utils/validator';\r\n    import helpers from '../utils/helpers';\r\n\r\n    export default {\r\n        name: 'flex-pagination',\r\n        props: {\r\n            pagination: {\r\n                type: Object,\r\n                required: true,\r\n                validator: validator.isValidPagination\r\n            },\r\n            range: {\r\n                type: Object,\r\n                required: false,\r\n                validator: validator.isValidRange\r\n            },\r\n            config: {\r\n                type: Object,\r\n                required: false,\r\n                validator: validator.isValidConfig\r\n            }\r\n        },\r\n        data() {\r\n            return {\r\n                default: {\r\n                    range: {\r\n                        before: 5,\r\n                        after: 5\r\n                    },\r\n                    config: {\r\n                        show: {\r\n                            first: true,\r\n                            last: true,\r\n                            next: true,\r\n                            prev: true\r\n                        },\r\n                        scroll: {\r\n                            prefix: null\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        },\r\n        computed: {\r\n\r\n            normalizedPage() {\r\n                return this.pagination.page > this.pagination.total ? this.pagination.total : this.pagination.page;\r\n            }\r\n\r\n        },\r\n        methods: {\r\n\r\n            getShow(to) {\r\n                return helpers.hasInnerProperty(this.config, 'show.' + to) ? this.config.show[to] : this.default.config.show[to];\r\n            },\r\n\r\n            getRangeLength(position) {\r\n                return helpers.hasInnerProperty(this.range, position) ? this.range[position] : this.default.range[position];\r\n            },\r\n\r\n            getRangeBefore() {\r\n                let start = this.pagination.page - this.getRangeLength('before');\r\n                start = start < 1 ? 1 : start;\r\n                let end = this.pagination.page - 1;\r\n                return helpers.rangeToArray(start, end);\r\n            },\r\n\r\n            getRangeAfter() {\r\n                let end = this.pagination.page + this.getRangeLength('after');\r\n                end = end > this.pagination.total ? this.pagination.total : end;\r\n                let start = this.pagination.page + 1;\r\n                start = this.pagination.page >= this.pagination.total ? this.pagination.page + 1 : start;\r\n                return helpers.rangeToArray(start, end);\r\n            },\r\n\r\n            getPrev() {\r\n                return this.hasPrev() ? this.pagination.page - 1 : this.pagination.page;\r\n            },\r\n\r\n            getNext() {\r\n                return this.hasNext() ? this.pagination.page + 1 : this.pagination.total;\r\n            },\r\n\r\n            hasPrev() {\r\n                return this.pagination.page - 1 > 0;\r\n            },\r\n\r\n            hasNext() {\r\n                return this.pagination.page + 1 <= this.pagination.total;\r\n            },\r\n\r\n            setPage(page) {\r\n                if (this.pagination.page !== page) {\r\n                    this.pagination.page = page;\r\n                    this.$emit('flexp:page', this.pagination.page);\r\n                }\r\n            }\r\n\r\n        }\r\n    }\r\n</script>\r\n\r\n<template>\r\n    <div class=\"flexp\">\r\n        <ul class=\"flexp-nav\">\r\n\r\n            <li class=\"flexp-btn flexp-first\"\r\n                v-if=\"getShow('first')\"\r\n                @click=\"setPage(1)\"\r\n                :class=\"{disabled: !hasPrev()}\">\r\n                <slot name=\"flexp-first\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        First\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n            <li class=\"flexp-btn flexp-previous\"\r\n                v-if=\"getShow('prev')\"\r\n                @click=\"setPage(getPrev())\"\r\n                :class=\"{disabled: !hasPrev()}\">\r\n                <slot name=\"flexp-previous\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        Previous\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n            <li class=\"flexp-btn flexp-range-before\"\r\n                v-for=\"iterator in getRangeBefore()\"\r\n                @click=\"setPage(iterator)\">\r\n                <div class=\"flexp-btn-icon\">\r\n                    {{ iterator }}\r\n                </div>\r\n            </li>\r\n\r\n            <li class=\"flexp-btn flexp-page active\">\r\n                <slot name=\"flexp-first\">\r\n                    {{ normalizedPage }}\r\n                </slot>\r\n            </li>\r\n\r\n            <li class=\"flexp-btn flexp-range-after\"\r\n                v-for=\"iterator in getRangeAfter()\"\r\n                @click=\"setPage(iterator)\">\r\n                <div class=\"flexp-btn-icon\">\r\n                    {{ iterator }}\r\n                </div>\r\n            </li>\r\n\r\n            <li class=\"flexp-btn flexp-next\"\r\n                v-if=\"getShow('next')\"\r\n                @click=\"setPage(getNext())\"\r\n                :class=\"{disabled: !hasNext()}\">\r\n                <slot name=\"flexp-next\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        Next\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n            <li class=\"flexp-btn flexp-last\"\r\n                v-if=\"getShow('last')\"\r\n                @click=\"setPage(pagination.total)\"\r\n                :class=\"{disabled: !hasNext()}\">\r\n                <slot name=\"flexp-first\">\r\n                    <div class=\"flexp-btn-icon\">\r\n                        Last\r\n                    </div>\r\n                </slot>\r\n            </li>\r\n\r\n        </ul>\r\n    </div>\r\n</template>\r\n\r\n<style>\r\n    .flexp li, .flexp ul {\r\n        display: block;\r\n        padding: 0;\r\n        margin: 0;\r\n        list-style: none;\r\n    }\r\n\r\n    .flexp li {\r\n        border: 1px solid #cccccc;\r\n        cursor: pointer;\r\n        padding: 3px 11px;\r\n        background: rgba(255, 255, 255, 1);\r\n        float: left;\r\n        margin: 0 2px 0 0;\r\n    }\r\n\r\n    .flexp li:hover, .flexp li.active, .flexp li.disabled {\r\n        background: rgba(0, 0, 0, .08);\r\n    }\r\n\r\n    .flexp li.disabled {\r\n        color: #cccccc;\r\n        background: #f8f8f8;\r\n    }\r\n\r\n    .flexp li.active, .flexp li.disabled {\r\n        cursor: default;\r\n    }\r\n</style>"]}, media: undefined });
 
   };
   /* scoped */
