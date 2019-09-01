@@ -38,7 +38,7 @@ let Validator = function() {
         return false;
     };
 
-    let isValidScrollPrefix = function(string) {
+    let isValidClassName = function(string) {
         let isValid = helpers.isValidClassName(string);
         if (!isValid) console.error("scroll prefix must be a valid html id name.");
         return isValid;
@@ -79,12 +79,18 @@ let Validator = function() {
         if (helpers.hasInnerProperty(config, 'show.last')) {
             isValid = isValid && isBoolean(config.show.last, 'config.show.last');
         }
-        if (helpers.hasInnerProperty(config, 'scroll.prefix')) {
-            isValid = isValid && isValidScrollPrefix(config.scroll.prefix.toString());
-        }
 
         return isValid;
     };
+
+    // self.isValidClassName = function (config = {}) {
+    //     let isValid = true;
+    //     if (helpers.hasInnerProperty(config, 'class')) {
+    //         isValid = isValid && isValidScrollPrefix(config.scroll.prefix.toString());
+    //     }
+    //
+    //     return isValid;
+    // };
 
 };
 
