@@ -1,6 +1,6 @@
 {
     "name": "flex-pagination",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "VueJs powerful but simple pagination component which is fully customizable and easy to use.",
     "main": "dist/js/flex-pagination.js",
     "scripts": {
