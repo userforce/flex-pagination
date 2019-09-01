@@ -65,7 +65,7 @@ config: {
 }
 ```
 
-#### Hide elements
+#### Events
 Each time you navigate on pagination an event is emitted. By default event name is 'flexp:page'. You can define a custom event name using config **[event]** property.
 **[event]** type (string) default 'flexp:page';
 
