@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<head>
+<head xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
     <script type="text/javascript" src="../dist/js/flex-pagination.js"></script>
@@ -35,6 +35,11 @@
         padding: 15px 15px 15px 0;
     }
 
+    .nav a {
+        display: block;
+        padding: 0 0 7px 0;
+    }
+
     a {
         text-decoration: none;
         color: #3586d1;
@@ -44,8 +49,9 @@
         color: #d35c5c;
     }
 
-    a.active {
-        color: #cccccc;
+    a.active, a.active:hover {
+        color: #d35c5c;
+        cursor: default;
     }
 
     .example {
@@ -115,12 +121,19 @@
         color: #0d5982;
     }
 
-    .flexp li.flexp-range-after, .flexp li.flexp-range-before {
+    .flexp .flexp-range-after, .flexp .flexp-range-before {
         background: #f8f8f8;
     }
 
-    .flexp li.flexp-range-after, .flexp li.flexp-range-before {
+    .flexp .flexp-range-after, .flexp .flexp-range-before {
         background: #f8f8f8;
+    }
+
+    .arrow-left {
+        left: 3px;
+        top: 3px;
+        height: 18px;
+        margin: 0 0 -5px 0;
     }
 
     .clear {
@@ -158,7 +171,7 @@
 <div id="app">
     <div class="wrapper">
         <p>
-            VueJs powerful but simple pagination component which is fully customizable and easy to use.<br/>
+            Vue.js2.0^ powerful but simple pagination component which is fully customizable and easy to use.<br/>
             Pagination | Customizable |
         </p>
         <div class="nav">
@@ -167,33 +180,43 @@
                 <a href="#ex-default"
                    @click="setNavActive('ex-default')"
                    :class="{ active: nav.active === 'ex-default'}">
-                    Basic example
+                    <b>Basic example</b>
                 </a>
-                <br/>
                 <a href="#ex-ranges"
                    @click="setNavActive('ex-ranges')"
                    :class="{ active: nav.active === 'ex-ranges'}">
-                    Ranges
+                    <b>Ranges</b>
                 </a>
-                <br/>
                 <a href="#ex-config"
                    @click="setNavActive('ex-config')"
                    :class="{ active: nav.active === 'ex-config'}">
-                    Configuration
+                    <b>Configuration</b>
                 </a>
-                <br/>
                 <a href="#ex-hide"
                    @click="setNavActive('ex-hide')"
                    :class="{ active: nav.active === 'ex-hide'}">
                     &nbsp;&nbsp;&nbsp;&nbsp;Hide elements
                 </a>
-                <br/>
                 <a href="#ex-events"
                    @click="setNavActive('ex-events')"
                    :class="{ active: nav.active === 'ex-events'}">
                     &nbsp;&nbsp;&nbsp;&nbsp;Events
                 </a>
-                <br/>
+                <a href="#ex-customization"
+                   @click="setNavActive('ex-customization')"
+                   :class="{ active: nav.active === 'ex-customization'}">
+                    <b>Customization</b>
+                </a>
+                <a href="#ex-templates"
+                   @click="setNavActive('ex-templates')"
+                   :class="{ active: nav.active === 'ex-templates'}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;Templates
+                </a>
+                <a href="#ex-style"
+                   @click="setNavActive('ex-style')"
+                   :class="{ active: nav.active === 'ex-style'}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;Styles
+                </a>
             </div>
         </div>
         <div class="content">
@@ -222,12 +245,8 @@
                 <b>Page {{ example1.pagination.page }}</b><br/>
                 <p v-html="content[example1.pagination.page - 1]"></p>
             </div>
-            <div class="result"><b>RESULT:</b> 3 pages are shown before the current page and 0 after. </div>
-            <flex-pagination :pagination="example1.pagination">
-    <!--            <template v-slot:flexp-first>-->
-    <!--                <h1>Here might be a page title</h1>-->
-    <!--            </template>-->
-            </flex-pagination>
+            <div class="result"><b>RESULT:</b></div>
+            <flex-pagination :pagination="example1.pagination"></flex-pagination>
             <div class="clear"></div>
 
 
@@ -318,7 +337,7 @@
                 <span class="light-blue">Events</span>
             </div>
             <div class="note">
-                Each time you navigate on pagination an event is emitted which can be used to update pagination.
+                Each time you navigate on pagination an event is emitted.
                 By default event name is 'flexp:page'. You can define a custom event name using config
                 <b>[event]</b> property.<br/>
                 <b>[event]</b> type (string) default 'flexp:page';<br/><br/>
@@ -332,16 +351,16 @@
             </div>
             <div class="code">
                 data: { <br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;currentPageContent: '',<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;pagination: {<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;page: {{ this.example4.pagination.page }},<br/><br/>
                 <span class="comment">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// NOTE: total pages will be updated just after request finished. <br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// NOTE: total pages will be updated after "request" result. <br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// For demonstration purpose, a random number will be taken in between 40 and 50.<br/>
                 </span>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;total: {{ this.example4.pagination.total }}
                 <br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;},<br/>
-                &nbsp;&nbsp;&nbsp;&nbsp;currentPageContent: ''<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;config: {<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="prop"><b>event</b></span>: <span class="event">'my:custom:event'</span><br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;},<br/>
@@ -362,9 +381,98 @@
                 </div>
                 <p v-if="!example4.isLoading" v-html="example4.pageContent"></p>
             </div>
+            <div class="result"><b>RESULT:</b></div>
             <flex-pagination :pagination="example4.pagination" v-on:my:custom:event="ex4LoadPage" :config="example4.config"></flex-pagination>
             <div class="clear"></div>
 
+
+
+            <div class="example-title" id="ex-customization">
+                <span class="light-blue">Customization</span>
+            </div>
+            <div class="note">
+                Flex pagination is fully customizable, you can replace pagination elements content and/or rewrite basic css.
+            </div>
+            <div class="clear"></div>
+
+
+
+            <div class="example-title" id="ex-templates">
+                <span class="light-blue">Templates</span>
+            </div>
+            <div class="note">
+                Content of any element in the flex pagination can be replaced using Vue.js slots features. Each slot
+                receive <b>[page]</b> property that can be used in the templates.<br/>
+                <b>[flexp:first]</b> slot name for pagination first;<br/>
+                <b>[flexp:previous]</b> slot name for pagination previous;<br/>
+                <b>[flexp:page]</b> slot name for pagination current page;<br/>
+                <b>[flexp:next]</b> slot name for pagination next;<br/>
+                <b>[flexp:last]</b> slot name for pagination last;<br/>
+                <b>[flexp:range:left]</b> slot name for elements of the left range;<br/>
+                <b>[flexp:range:right]</b> slot name for elements of the right range;<br/>
+            </div>
+            <div class="code">
+                &lt;flex-pagination :pagination="pagination"&gt;
+                <br/><br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;template <span class="event">v-slot:flexp:first</span>&gt;
+                <div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;svg viewBox="0 0 70 120"&gt;&lt;path d="M70 0, 0 50, 70 100, 70 70, 45 50, 70 30, Z"/&gt;&lt;/svg&gt;
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;
+                <br/><br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;template <span class="event">v-slot:flexp:previous</span>="<b>prev</b>"&gt;
+                <div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back to page:
+                    &lbrace;&lbrace; <b>prev</b><span class="prop">.page</span> &rbrace;&rbrace;
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br/>
+                <br/><br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;template <span class="event">v-slot:flexp:range:before</span>="<b>before</b>"&gt;
+                <div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;span style="color: red;"&gt;<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &lbrace;&lbrace; <b>before</b><span class="prop">.page</span> &rbrace;&rbrace;<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span&gt;<br/>
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br/>
+                <br/><br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;template <span class="event">v-slot:flexp:page</span>="<b>current</b>"&gt;
+                <div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;span style="color: green; font-weight: bold;"&gt;<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &lbrace;&lbrace; <b>current</b><span class="prop">.page</span> &rbrace;&rbrace;<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/span&gt;<br/>
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;/template&gt;<br/>
+                <br/><br/>
+                &lt;/flex-pagination&gt;
+            </div>
+            <div class="example">
+                <b>Page {{ example5.pagination.page }}</b><br/>
+                <p v-html="content[example5.pagination.page - 1]"></p>
+            </div>
+            <div class="result"><b>RESULT:</b></div>
+            <flex-pagination :pagination="example5.pagination">
+                <template v-slot:flexp:first>
+                    <svg class="arrow-left" viewBox="0 0 70 120" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M70 0, 0 50, 70 100, 70 70, 45 50, 70 30, Z"/>
+                    </svg>
+                </template>
+                <template v-slot:flexp:previous="prev">
+                    Back to page: {{ prev.page }}
+                </template>
+                <template v-slot:flexp:range:before="before">
+                    <span style="color: red;">
+                        {{ before.page }}
+                    </span>
+                </template>
+                <template v-slot:flexp:page="current">
+                    <span style="color: green; font-weight: bold;">
+                        {{ current.page }}
+                    </span>
+                </template>
+            </flex-pagination>
+            <div class="clear"></div>
 
 
         </div>
@@ -424,6 +532,12 @@
                     },
                     config: {
                         event: 'my:custom:event'
+                    }
+                },
+                example5: {
+                    pagination: {
+                        page: 10,
+                        total: totalPages,
                     }
                 },
                 totalPages: totalPages,
