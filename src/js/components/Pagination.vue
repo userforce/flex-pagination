@@ -49,8 +49,8 @@
         },
         methods: {
 
-            getShow(to) {
-                return helpers.hasInnerProperty(this.config, 'show.' + to) ? this.config.show[to] : this.default.config.show[to];
+            getConfigShow(element) {
+                return helpers.hasInnerProperty(this.config, 'show.' + element) ? this.config.show[element] : this.default.config.show[element];
             },
 
             getRangeLength(position) {
@@ -91,7 +91,7 @@
             setPage(page) {
                 if (this.pagination.page !== page) {
                     this.pagination.page = page;
-                    let event = this.config.event ? this.config.event : this.default.config.event;
+                    let event = helpers.hasInnerProperty(this.config, 'event') ? this.config.event : this.default.config.event;
                     this.$emit(event, this.pagination.page);
                 }
             }
@@ -104,10 +104,11 @@
         <ul class="flexp-nav">
 
             <li class="flexp-btn flexp-first"
-                v-if="getShow('first')"
+                v-if="getConfigShow('first')"
                 @click="setPage(1)"
                 :class="{disabled: !hasPrev()}">
-                <slot name="flexp-first">
+                <slot name="flexp:first"
+                      v-bind:page="1">
                     <div class="flexp-btn-icon">
                         First
                     </div>
@@ -115,10 +116,11 @@
             </li>
 
             <li class="flexp-btn flexp-previous"
-                v-if="getShow('prev')"
+                v-if="getConfigShow('prev')"
                 @click="setPage(getPrev())"
                 :class="{disabled: !hasPrev()}">
-                <slot name="flexp-previous">
+                <slot name="flexp:previous"
+                      v-bind:page="getPrev()">
                     <div class="flexp-btn-icon">
                         Previous
                     </div>
@@ -128,13 +130,17 @@
             <li class="flexp-btn flexp-range-before"
                 v-for="iterator in getRangeBefore()"
                 @click="setPage(iterator)">
-                <div class="flexp-btn-icon">
-                    {{ iterator }}
-                </div>
+                <slot name="flexp:range:before"
+                      v-bind:page="iterator">
+                    <div class="flexp-btn-icon">
+                        {{ iterator }}
+                    </div>
+                </slot>
             </li>
 
             <li class="flexp-btn flexp-page active">
-                <slot name="flexp-first">
+                <slot name="flexp:page"
+                      v-bind:page="normalizedPage">
                     {{ normalizedPage }}
                 </slot>
             </li>
@@ -142,16 +148,20 @@
             <li class="flexp-btn flexp-range-after"
                 v-for="iterator in getRangeAfter()"
                 @click="setPage(iterator)">
-                <div class="flexp-btn-icon">
-                    {{ iterator }}
-                </div>
+                <slot name="flexp:range:after"
+                      v-bind:page="iterator">
+                    <div class="flexp-btn-icon">
+                        {{ iterator }}
+                    </div>
+                </slot>
             </li>
 
             <li class="flexp-btn flexp-next"
-                v-if="getShow('next')"
+                v-if="getConfigShow('next')"
                 @click="setPage(getNext())"
                 :class="{disabled: !hasNext()}">
-                <slot name="flexp-next">
+                <slot name="flexp:next"
+                      v-bind:page="getNext()">
                     <div class="flexp-btn-icon">
                         Next
                     </div>
@@ -159,10 +169,11 @@
             </li>
 
             <li class="flexp-btn flexp-last"
-                v-if="getShow('last')"
+                v-if="getConfigShow('last')"
                 @click="setPage(pagination.total)"
                 :class="{disabled: !hasNext()}">
-                <slot name="flexp-first">
+                <slot name="flexp:last"
+                      v-bind:page="pagination.total">
                     <div class="flexp-btn-icon">
                         Last
                     </div>
@@ -174,14 +185,14 @@
 </template>
 
 <style>
-    .flexp li, .flexp ul {
+    .flexp-btn, .flexp-nav {
         display: block;
         padding: 0;
         margin: 0;
         list-style: none;
     }
 
-    .flexp li {
+    .flexp-btn {
         border: 1px solid #cccccc;
         cursor: pointer;
         padding: 3px 11px;
@@ -190,16 +201,19 @@
         margin: 0 2px 0 0;
     }
 
-    .flexp li:hover, .flexp li.active, .flexp li.disabled {
+    .flexp-btn:hover,
+    .flexp-btn.active,
+    .flexp-btn.disabled {
         background: rgba(0, 0, 0, .08);
     }
 
-    .flexp li.disabled {
+    .flexp-btn.disabled {
         color: #cccccc;
         background: #f8f8f8;
     }
 
-    .flexp li.active, .flexp li.disabled {
+    .flexp-btn.active,
+    .flexp-btn.disabled {
         cursor: default;
     }
 </style>
