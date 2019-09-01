@@ -166,17 +166,53 @@
     .event {
         background: #d2f2bd;
     }
+
+    .my-class .flexp-btn {
+        border: 2px solid grey;
+        font-weight: bold;
+    }
+
+    .my-class .flexp-btn:hover {
+        border-color: red;
+        color: red;
+    }
+
+    .my-class .flexp-first,
+    .my-class .flexp-last {
+        border-color: blue;
+        color: blue;
+    }
+
+    .my-class .flexp-previous,
+    .my-class .flexp-next {
+        border-color: orangered;
+        color: orangered;
+    }
+
+    .my-class .flexp-range-before,
+    .my-class .flexp-range-after {
+        border-color: green;
+        color: green;
+    }
+
+    .my-class .flexp-page.active {
+        border-color: white;
+        background: white;
+        color: black;
+    }
+
 </style>
 <body style="margin: 0; padding: 0;">
 <div id="app">
     <div class="wrapper">
-        <p>
-            Vue.js2.0^ powerful but simple pagination component which is fully customizable and easy to use.<br/>
-            Pagination | Customizable |
-        </p>
         <div class="nav">
             <img src="logo.png"/>
             <div class="nav-wrapper">
+                <a href="#installation"
+                   @click="setNavActive('installation')"
+                   :class="{ active: nav.active === 'installation'}">
+                    <b>Installation</b>
+                </a>
                 <a href="#ex-default"
                    @click="setNavActive('ex-default')"
                    :class="{ active: nav.active === 'ex-default'}">
@@ -217,9 +253,29 @@
                    :class="{ active: nav.active === 'ex-style'}">
                     &nbsp;&nbsp;&nbsp;&nbsp;Styles
                 </a>
+                <hr/>
+                <img src="https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/userforce/flex-pagination/master/package.json&label=name&query=$.name&color=blue"><br/>
+                <img src="https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/userforce/flex-pagination/master/package.json&label=version&query=$.version&color=blue" /><br/>
+                <img src="https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/userforce/flex-pagination/master/package.json&label=license&query=$.license&color=lightgrey" /><br/>
+                <img src="https://img.shields.io/badge/build-passing-green" /><br/>
+                <img src="https://img.shields.io/npm/dt/flex-pagination" />
             </div>
         </div>
+
         <div class="content">
+
+            <div class="note" style="margin-top: 15px">
+                Vue.js <b>2.0^</b> powerful but simple pagination component which is fully customizable and easy to use.<br/>
+            </div>
+
+            <div class="example-title" id="installation">
+                <span class="light-blue">Installation</span>
+            </div>
+            <div class="code">
+                npm install flex-pagination
+            </div>
+
+
 
             <div class="example-title" id="ex-default">
                 <span class="light-blue">Basic example</span>
@@ -408,8 +464,8 @@
                 <b>[flexp:page]</b> slot name for pagination current page;<br/>
                 <b>[flexp:next]</b> slot name for pagination next;<br/>
                 <b>[flexp:last]</b> slot name for pagination last;<br/>
-                <b>[flexp:range:left]</b> slot name for elements of the left range;<br/>
-                <b>[flexp:range:right]</b> slot name for elements of the right range;<br/>
+                <b>[flexp:range:before]</b> slot name for elements of the range before current page;<br/>
+                <b>[flexp:range:after]</b> slot name for elements of the range after current page;<br/>
             </div>
             <div class="code">
                 &lt;flex-pagination :pagination="pagination"&gt;
@@ -475,6 +531,70 @@
             <div class="clear"></div>
 
 
+
+            <div class="example-title" id="ex-style">
+                <span class="light-blue">Styles</span>
+            </div>
+            <div class="note">
+                You can rewrite native classes directly or by adding new class to the flex pagination component.
+                The class names follows the same pattern as other flex pagination features.
+            </div>
+            <div class="code">
+                &lt;flex-pagination
+                <span class="blue">:pagination</span>="<b>pagination</b>"
+                <span class="blue">class</span>="<span class="prop"><b>my-class</b></span>"&gt;&lt;/flex-pagination&gt;
+            </div>
+            <div class="code">
+                <br/>
+                <span class="prop">.my-class</span> .flexp-<span class="event">btn</span> {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;border: 2px solid grey;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;font-weight: bold;<br/>
+                }
+                <br/>
+                <br/>
+                <span class="prop">.my-class</span> .flexp-<span class="event">btn</span>:hover {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;border-color: red;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;color: red;<br/>
+                }
+                <br/>
+                <br/>
+                <span class="prop">.my-class</span> .flexp-<span class="event">first</span>,<br/>
+                <span class="prop">.my-class</span> .flexp-<span class="event">last</span> {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;border-color: blue;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;color: blue;<br/>
+                }
+                <br/>
+                <br/>
+                <span class="prop">.my-class</span> .flexp-<span class="event">previous</span>,<br/>
+                <span class="prop">.my-class</span> .flexp-<span class="event">next</span> {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;border-color: orangered;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;color: orangered;<br/>
+                }
+                <br/>
+                <br/>
+                <span class="prop">.my-class</span> .flexp-<span class="event">range-before</span>,<br/>
+                <span class="prop">.my-class</span> .flexp-<span class="event">range-after</span> {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;border-color: green;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;color: green;<br/>
+                }
+                <br/>
+                <br/>
+                <span class="prop">.my-class</span> .flexp-<span class="event">page</span>.active {<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;border-color: white;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;background: white;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;color: black;<br/>
+                }
+                <br/>
+            </div>
+            <div class="example">
+                <b>Page {{ example1.pagination.page }}</b><br/>
+                <p v-html="content[example1.pagination.page - 1]"></p>
+            </div>
+            <div class="result"><b>RESULT:</b></div>
+            <flex-pagination :pagination="example6.pagination" class="my-class"></flex-pagination>
+            <div class="clear"></div>
+
+
         </div>
     </div>
     <div class="footer"></div>
@@ -535,6 +655,12 @@
                     }
                 },
                 example5: {
+                    pagination: {
+                        page: 10,
+                        total: totalPages,
+                    }
+                },
+                example6: {
                     pagination: {
                         page: 10,
                         total: totalPages,
